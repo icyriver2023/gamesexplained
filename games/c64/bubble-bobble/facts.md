@@ -238,7 +238,7 @@ Numbers are the game's; names describe the pictures.
 | `$0B` | purple lamp | every enemy is beaten at once: the six sprites gather into a flashing picture (state `$13`), then fall as food |
 | `$0C`-`$0E` | rings | 10 points for every jump, step or bubble |
 | `$0F` | clock | enemies frozen and the timer stopped for `$87` passes |
-| `$10`-`$12` | potions | a bonus room: up to 85 foods, 30 seconds |
+| `$10`-`$12` | potions | a bonus room: 30 seconds to collect blocks (notes, arches or rings by the potion) at 500 points each |
 | `$13`, `$1C`, `$1E`, `$1F` | four more pictures | points only |
 | `$14`, `$16` | umbrellas | skip 3 rounds, skip 7 |
 | `$18` | heart | enemies frozen where they stand, players invincible until the round ends |
@@ -339,6 +339,31 @@ Seen in the image; the original disk was not available to compare.
 - `$F044` is written by the menu with the starting round.
 - `$4800`-`$4BFF` and `$5000`-`$55BE` held the menu and its stash at the
   hand-over.
+
+## The listing's comments, sampled
+
+Three samples of 60 comments each, 30 on code and 30 on data, drawn with
+Python's `random` (seeds 1987, 1988 and 1989), each from the comments no
+earlier sample held, out of 1,194. An agent that wrote none of them
+checked every one against the bytes.
+
+| Sample | Drawn | With a detail that fails the check | 95 % interval |
+|---|---|---|---|
+| 1 | from the listing as first written | 11 of 60 | 11 % to 30 % |
+| 2 | after sample 1's findings, and slips of the same kinds, had been rewritten | 10 of 60 | 9 % to 28 % |
+| 3 | after the audit below | 5 of 60 (2 of 30 on code, 3 of 30 on data) | 4 % to 18 % |
+
+No comment in any sample misidentified its routine, table or variable.
+The details that failed were units (frames for runs of the actor
+loop or passes of the main loop), the values a compare lets through, a
+direction or an order, a count, "once" for "every time", and labels
+that are only the as-loaded operand of a patched instruction. Sixteen of
+the 21 in the first two samples were routine descriptions, so a second
+agent audited all 367 routine comments outside those samples and
+rewrote 99. Every comment faulted in a sample or the audit has been
+rewritten. The 707 comments on tables and variables outside the samples
+have not been checked one by one; sample 3 puts their rate near one in
+ten.
 
 ## Live tests
 

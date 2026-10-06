@@ -22,7 +22,11 @@ same way, so tiers mean the same thing everywhere.
    does in terms of the game (what the player sees, which feature in
    `features.md` it serves). Name it. Write a **line comment on its entry
    address** that describes the whole thing: purpose, inputs, outputs,
-   side effects, which tables it reads. While it is in front of you, note
+   side effects, which tables it reads. Write it now, with the listing
+   on screen: a comment written later, from the notes of one reading of
+   the whole program, gets the routine right and its details wrong (the
+   unit of a counter, which states a compare lets through, up for
+   down). While it is in front of you, note
    anything it would accept that the player was never meant to do: an
    exact match where a range was meant, a comparison that assumes a sign,
    an eight-bit sum that can wrap, a test whose order leaves a gap. Put

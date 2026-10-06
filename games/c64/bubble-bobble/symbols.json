@@ -14513,7 +14513,7 @@
   {
    "address": 104,
    "type": "line",
-   "text": "Item number of the food that every leftover bubble turns into when the round is cleared: chosen at the start of a food round, or set with the giant food by one of five special items; 0 for none."
+   "text": "Item number of the food that every leftover bubble turns into when the round is cleared: chosen at the start of a food round, or set with the giant food by one of seven special items (the four canes and the three chests, which share five routines); 0 for none."
   },
   {
    "address": 105,
@@ -15198,7 +15198,7 @@
   {
    "address": 4187,
    "type": "line",
-   "text": "Test object X against the six enemies: one in an ordinary state (2-9), already freed ($0A) or frozen ($16, $17), within 16 pixels, is taken into the bubble. The object becomes type $18 + 2 \u00d7 enemy number, remembers the enemy's kind and animation, and the enemy's own slot is emptied."
+   "text": "Test object X against the six enemies: one in an ordinary state (2-9), already freed ($0A) or frozen ($16, $17), within 16 pixels, is taken into the bubble. The object becomes type $18 + 2 \u00d7 enemy number, remembers the enemy's kind and takes the frame that kind shows inside a bubble (kind_bubble_frame_m2), and the enemy's own slot is emptied."
   },
   {
    "address": 4307,
@@ -15278,7 +15278,7 @@
   {
    "address": 5054,
    "type": "line",
-   "text": "Count down each object's lifetime. At zero: a plain bubble bursts by itself (type $3A); a bubble with an enemy lets it out angry, in the state enemy_release_state, with its animation restored; an enemy's readied shot (type $42) is freed. In the last 16 passes a plain bubble alternates with the blink type $48 and a carried enemy's sprite flickers. Then it counts the slots that are free or ending (type $34 or more); if fewer than two are, the table is nearly full and one plain bubble is burst to make room."
+   "text": "Count down each object's lifetime. At zero: a plain bubble bursts by itself (type $3A); a bubble with an enemy lets it out angry, in the state enemy_release_state, with its frame set to 0; an enemy's readied shot (type $42) is freed. In the last 16 passes a plain bubble alternates with the blink type $48 and a carried enemy's sprite flickers. Then it counts the slots that are free or ending (type $34 or more); if fewer than two are, the table is nearly full and one plain bubble is burst to make room."
   },
   {
    "address": 5215,
@@ -15858,22 +15858,22 @@
   {
    "address": 12157,
    "type": "line",
-   "text": "Special item $10, a potion: a bonus room of food drawn in colour $0D, with picture pair $C0."
+   "text": "Special item $10, a potion: a bonus room of musical-note blocks in colour $0D, drawn with the picture pair at $A2C0."
   },
   {
    "address": 12163,
    "type": "line",
-   "text": "Special item $11, a potion: a bonus room in colour $0C with picture pair $00."
+   "text": "Special item $11, a potion: a bonus room of arch-shaped blocks in colour $0C, drawn with the picture pair at $A300."
   },
   {
    "address": 12169,
    "type": "line",
-   "text": "Special item $12, a potion: a bonus room in colour $0F with picture pair $E0."
+   "text": "Special item $12, a potion: a bonus room of ring-shaped blocks in colour $0F, drawn with the picture pair at $A2E0."
   },
   {
    "address": 12173,
    "type": "line",
-   "text": "Clear the playfield of enemies and objects, then fill it with 2 by 2 food blocks (characters $42-$45): in every second row from row 1 and every second column, wherever four free cells exist, for a number of rows from 1 to 10 that depends on the round ($2A EOR the round index, reduced by tens), stopping after the row that brings the count to 85 or more; each is remembered with its sprite position and screen address. Thirty seconds on the timer; the players collect them (bonus_collect) for 500 points each; then the scene is cleared and a results panel shows each player's count. Only if every block was taken is there an award: 100,000 points to a player who took at least as many as the other, 50,000 to one who took fewer."
+   "text": "Clear the playfield of enemies and objects, then fill it with 2 by 2 blocks (characters $42-$45, a note, an arch or a ring by the potion): in every second row from row 1 and every second column, wherever four free cells exist, for a number of rows from 1 to 10 that depends on the round ($2A EOR the round index, reduced by tens), stopping after the row that brings the count to 85 or more; each is remembered with its sprite position and screen address. Thirty seconds on the timer; the players collect them (bonus_collect) for 500 points each; then the scene is cleared and a results panel shows each player's count. Only if every block was taken is there an award: 100,000 points to a player who took at least as many as the other, 50,000 to one who took fewer."
   },
   {
    "address": 12448,
@@ -16328,7 +16328,7 @@
   {
    "address": 16912,
    "type": "line",
-   "text": "Characters $42-$45, empty as loaded: the points item's four glyphs, copied here from item_pictures each round; also the food blocks of the bonus rooms."
+   "text": "Characters $42-$45, empty as loaded: the points item's four glyphs, copied here from item_pictures each round; also the blocks of the bonus rooms (a note, an arch or a ring)."
   },
   {
    "address": 16944,
@@ -16398,7 +16398,7 @@
   {
    "address": 17965,
    "type": "line",
-   "text": "The title page as one string for print_string: four rows of logo characters, then WRITTEN BY STEPHEN RUDDY, GRAPHICS BY ANDREW THRELFALL, COMMODORE CONVERSION BY SOFTWARE CREATIONS, PRODUCED BY FIREBIRD, LICENSED BY FIREBIRD FROM TAITO ELECTRONICS and PRESS FIRE FOR BUBBLE BOBBLE. Overwritten in play."
+   "text": "The first of the title page's two strings for print_string ($462D-$46EF): four rows of logo characters and WRITTEN BY STEPHEN RUDDY. The second ($46F0-$47B4) has GRAPHICS BY ANDREW THRELFALL, COMMODORE CONVERSION BY SOFTWARE CREATIONS, PRODUCED BY FIREBIRD, LICENSED BY FIREBIRD FROM TAITO ELECTRONICS and PRESS FIRE FOR BUBBLE BOBBLE. Both are overwritten in play."
   },
   {
    "address": 17992,
@@ -17023,7 +17023,7 @@
   {
    "address": 29760,
    "type": "line",
-   "text": "Sprites $D1-$D8 ($7440-$763F): the large bubble the players float in at the start of a game and between rounds, four sprites to a bubble (two rows of two) in two animation steps, with the dragon inside drawn by the top pair."
+   "text": "Sprites $D1-$D8 ($7440-$763F): the large bubble the players float in at the start of a game and between rounds, four sprites to a bubble (two rows of two) in two animation steps. The dragon inside is drawn across the middle, its upper part at the bottom of the top pair and its lower part at the top of the bottom pair."
   },
   {
    "address": 30272,
@@ -17168,7 +17168,7 @@
   {
    "address": 32062,
    "type": "line",
-   "text": "In the item sprite buffer: a marker byte of effect_six_sprites_b's picture."
+   "text": "In the item sprite buffer: a byte of pixels that effect_six_sprites_b writes into its picture."
   },
   {
    "address": 32118,
@@ -17183,12 +17183,12 @@
   {
    "address": 32188,
    "type": "line",
-   "text": "In the second buffer: a marker byte of effect_six_sprites_b's picture."
+   "text": "In the second buffer: a byte of pixels that effect_six_sprites_b writes into its picture."
   },
   {
    "address": 32194,
    "type": "line",
-   "text": "In the second buffer: another marker byte of that picture."
+   "text": "In the second buffer: another byte of pixels of that picture."
   },
   {
    "address": 32256,
@@ -17198,7 +17198,7 @@
   {
    "address": 32320,
    "type": "line",
-   "text": "In the third buffer: the last marker byte of that picture."
+   "text": "In the third buffer: the last byte of pixels that effect_six_sprites_b writes into its picture."
   },
   {
    "address": 32384,
@@ -17873,7 +17873,7 @@
   {
    "address": 42592,
    "type": "line",
-   "text": "Glyphs of the secret room, 176 bytes copied to characters $60-$75: the room's own alphabet for its message, its frame and floor. The first 50 bytes are also copied to the wall glyph slot."
+   "text": "Glyphs of the secret room: the room's own alphabet for its message, its frame and floor. effect_secret_room copies 256 bytes from here to characters $60-$7F, of which the first 176 are these glyphs, and the first 50 bytes also to the wall glyph slot."
   },
   {
    "address": 42768,
@@ -18528,7 +18528,7 @@
   {
    "address": 44380,
    "type": "line",
-   "text": "Page number (0-3) of each of 25 rows within a screen; then from $AD75 the twelve five-byte small digit shapes that the round number uses."
+   "text": "Per row of a screen, 0 or 1: a 1 at rows 7, 13 and 20, where a row's address crosses into the next page. repair_back_buffer adds them up row by row to make row_hi. Then from $AD75 the twelve five-byte small digit shapes that the round number uses."
   },
   {
    "address": 44465,

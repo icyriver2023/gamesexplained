@@ -4,6 +4,13 @@
 described (`coverage.py`). What Gold needs is a person: read the page
 section by section, cut what is dull, and say what deserves more.
 
+## The listing
+
+- The comments on tables and variables (767 of the 1,194) were sampled,
+  not audited: about one in ten still has a wrong detail (`facts.md`,
+  "The listing's comments, sampled"). The routine comments were all
+  checked by a second agent.
+
 ## Not verified live
 
 - The giant foods (actor state `$15`) are described from the code. They

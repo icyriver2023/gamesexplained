@@ -23,7 +23,7 @@ two at once.
 
 ## What was changed in the kit
 
-- `kit/skills/core/50-coverage/SKILL.md`: a rule to name a kind of object from its picture and colour, not from its handler: `kit/lessons/2026-10-06-bubble-bobble.md`.
+- `kit/skills/core/50-coverage/SKILL.md`: a rule to name a kind of object from its picture and colour, not from its handler, and a sentence in the loop's second step to write each description with the listing on screen: `kit/lessons/2026-10-06-bubble-bobble.md`.
 - `kit/c64/tools.py`: `vice` makes one MCP call after the emulator comes up and says so when it is not answered. An emulator whose machine thread never starts has an open port and reads as up; `check-emulator` then waits for ever with nothing on screen.
 - `kit/c64/INSTALL.md`, macOS: "The emulator is up and answers nothing", with the symptom, how it was traced to the host's sound output, and the `vicerc` setting that cures it.
 
@@ -39,4 +39,4 @@ None.
 
 ## What cost the most time
 
-A sheet of every object picture drawn from its pointer table before the first object type was named would have saved the pass that renamed water, fire, thunder and the enemies' shots.
+Writing each routine's comment with its listing on screen, as `50-coverage` now says, in place of four hundred comments written in batches from one reading of the code, would have saved the two samples, the audit and the third sample that measured it, about fifty minutes.

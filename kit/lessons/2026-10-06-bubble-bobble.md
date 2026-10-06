@@ -26,3 +26,15 @@ what it held was found by following the tune table's pointers, not by
 looking at the bytes. `10-orient`'s hand-over snapshot and
 `50-coverage`'s rule on pointer tables already lead there, and they
 did.
+
+**A comment written from memory is right about the routine and wrong
+about its details.** The 22 KB of code were read once, end to end, and
+the 400 routine comments written afterwards in batches from that
+reading. An agent that had written none of them found a wrong detail in
+one of four: frames where the code counts runs of a loop, a compare
+described by the values it was meant for and not the ones it accepts,
+up for down, once for every time. None named the wrong routine.
+Correcting the kinds of slip a first sample found did not move the
+rate in a second; only a full audit by a fresh agent did, and it
+rewrote 99 of 367. `50-coverage` now says to write each description
+with its listing on screen.
