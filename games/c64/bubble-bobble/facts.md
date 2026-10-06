@@ -69,12 +69,15 @@ Measured and read on PAL.
 - Two raster interrupts a frame, `irq_bottom` at line 251 and `irq_top`
   at line 50 (`$32`). No CIA interrupt: `start` clears CIA 1's mask.
 - `frame_count` (`$08`) counts frames. A pass of the main loop
-  (`pass_loop`, `$0A07`) lasts until two frames have gone by, so the
-  bubbles and the timers in the loop run 25 times a second.
+  (`pass_loop`, `$0A07`) takes three frames: `flip_buffers` waits for a
+  frame at its start, and the pass ends when two more have gone by. The
+  bubbles and every timer counted in passes therefore run 16.7 times a
+  second: 100 passes were counted in 300 frames.
 - The actors' logic, `update_actors` (`$1CBD`), runs inside `irq_top` on
-  every other frame, also 25 times a second, independently of the pass
-  loop. An actor with its fast flag set gets a second call on alternate
-  runs, which makes it half as fast again.
+  every other frame, 25 times a second (150 runs in the same 300
+  frames), independently of the pass loop. An actor with its fast flag
+  set gets a second call on alternate runs, which makes it half as fast
+  again.
 - `round_timer` (`$2A`) loses one every 50 frames (`irq_bottom`).
 
 ## A round
@@ -133,8 +136,9 @@ Eighteen slots (`object_type` `$CA`). The type is an even number:
 The letter E bubble gives the first E, or the second when the first is
 held (`draw_burst`).
 
-A bubble a player blows travels `bubble_travel` steps of 8 pixels
-(`blown_step` `$0F61`), growing through three sizes, and catches the
+A bubble a player blows travels in steps of 8 pixels, 8 of them or 12
+with the long-range power (the low bits of `bubble_travel`;
+`blown_step` `$0F61`), growing through three sizes, and catches the
 first ordinary enemy within 16 pixels (`catch_enemy` `$105B`). A held
 enemy escapes angry when the bubble's life runs out (`age_objects`
 `$13BE`).
@@ -170,8 +174,8 @@ all 100 lists.
 | 0 | 2 | white wind-up robot | walks, climbs towards its player (`enemy_walker`) | 1 | 114 |
 | 1 | 3 | grey spiky creature | walker that shoots a fireball along its row (`enemy_shooter`) | 40 | 62 |
 | 2 | 4 | green head on a spring | moves only by hopping (`enemy_hopper`) | 30 | 48 |
-| 3 | 5 | pale green flyer | flies diagonally, one pixel a call (`enemy_flyer`) | 20 | 78 |
-| 4 | 6 | purple whale shape | flies diagonally, two pixels a call (`enemy_flyer_fast`) | 10 | 75 |
+| 3 | 5 | pale green flyer | flies two pixels across and one up or down a call (`enemy_flyer`) | 20 | 78 |
+| 4 | 6 | purple whale shape | flies two pixels each way a call (`enemy_flyer_fast`) | 10 | 75 |
 | 5 | 7 | green cloak, red face | walker that throws a bottle that comes back | 50 | 62 |
 | 6 | 8 | white robed figure | walker that rolls a slow boulder | 6 | 72 |
 | 7 | 9 | white robot on legs | walks and drops a bolt straight down (`enemy_dropper`) | 60 | 61 |
@@ -181,9 +185,11 @@ Holding S, U, P, O, R and the Commodore key on the title page
 becomes 5.
 
 The boss of round 100 (`boss_move` `$1D84`, `boss_hit_test` `$1134`)
-bounces round the playfield. Fifty thunder bolts put it in its beaten
-frame for `$82` passes; a player who touches it then ends the game, and
-if nobody does it recovers with 40 hits and moves twice as fast.
+bounces round the playfield. `boss_hits` starts at 50 and each thunder
+bolt takes one off; the bolt that takes it below zero (the 51st) puts
+the boss in its beaten frame for `$82` passes. A player who touches it
+then ends the game; if nobody does it recovers with a count of 40 and
+moves twice as fast.
 
 ## Scoring
 
@@ -197,12 +203,13 @@ thousands and the top byte hundreds of thousands (`add_score` `$7C26`).
 | burst a water, fire or thunder bubble | 100 | `draw_burst` |
 | burst 1, 2, 3, 4, 5, 6 held enemies in one chain | 1,000, 2,000, 4,000, 8,000, 10,000, 20,000 | `chain_bonus` |
 | food left by the 1st to 8th enemy of a chain | 500, 1,000, 2,000, 3,000, 4,000, 5,000, 8,000, 9,000 | `food_scores` |
+| food left by an enemy that water carried off, fire burnt, or anything else beat | 8,000, 9,000, 10,000 | `carried_by_water`, `run_fires`, `kill_enemy` |
 | points item | 10 to 12,000 by item | `points_item_scores` |
 | special item | 10 to 8,000 by item | `special_item_scores` |
 | falling food of a food round | 700 | `food_fall` |
 | a block in a bonus room | 500 | `bonus_block_score` |
 | every block of a bonus room taken | 100,000, or 50,000 to the player with fewer | `bonus_room` |
-| a block in the secret room | 12,000 (36 can be taken: 432,000) | `effect_secret_room` |
+| a block in the secret room | 12,000 (36 blocks: 432,000) | `effect_secret_room` |
 | jumping, walking, blowing with a ring | 10 each time | `score_ten` |
 | round 100 | 1,000,000 | `ending` |
 
@@ -212,7 +219,8 @@ million up to 9,000,000 (`check_extra_life` `$F1AC`,
 
 ## Special items
 
-One appears each round, 1 to 16 seconds in (`place_items` `$2B31`).
+One appears each round, 1 to 16 seconds in, and is removed 12 seconds
+later (`place_items` `$2B31`, `round_timers` `$1578`).
 Numbers are the game's; names describe the pictures.
 
 | No. | Picture | Effect |
@@ -243,6 +251,19 @@ Numbers are the game's; names describe the pictures.
 Doors replace the round's item after rounds 19, 29, 39, 49 (the `$21`
 door), 79 and 89, as long as one player has not lost a life
 (`doors_possible` `$5B7F`).
+
+## Quirks
+
+- `special_round_setup` (`$F217`) loads `$1E`, or `$E6` on rounds 35 and
+  97, into Y for the threshold that decides how two overlapping bubbles
+  part, and then stores A, which holds the level number. The threshold
+  is therefore 0 on round 1 and grows by one a round. Read from the
+  running game: 0 on round 1 and `$63` on round 100.
+- `init_round_state` reaches its `JSR play_tune` on round 100 through an
+  undocumented three-byte no-op (`$5C` at `$05E7`), the tail of a BIT
+  skip placed in front of a three-byte instruction.
+- The title page, its lettering and its tune are overwritten by the
+  first game (`start` `$4460`, `title_tune` `$8B00`).
 
 ## Sound
 
@@ -341,7 +362,8 @@ recipe in `orientation.md`, stepped by frames.
 - **Timer.** With the players made safe, `hurry_stage` became 1 1,500
   frames after play began and the Baron's object appeared 500 frames
   later. The Baron is drawn only when its jingle has ended, because
-  `barons_appear` waits for the tune inside the pass loop. It then moved
+  `barons_appear` waits for the tune inside the pass loop; the round
+  tune then restarts as tune 5, the same notes a step faster. It then moved
   one cell along X, two along Y, and four along Y again, the X run in
   between ending at once because it was already in its player's column.
 - **EXTEND.** `extend_bits` set to `$3F`: the scene ran, lives went
@@ -353,7 +375,11 @@ recipe in `orientation.md`, stepped by frames.
   became `$64`, the score went from 0 to 1,000,000 and the ending
   appeared with tune `$51`.
 - **Controls.** From the round-start snapshot, fire made a bubble and up
-  a jump that rose 43 pixels.
+  a jump that rose 43 pixels. The bubble flew 64 pixels in eight steps,
+  one step a pass, small for three steps, medium for three and full
+  size from the seventh.
+- **Rates.** Non-stopping checkpoints over 300 frames: `irq_bottom` 300,
+  `update_actors` 150, `pass_loop` 100.
 - **One frame.** `kit/c64/frame.py capture` in play: eight register
   writes, and the frame rebuilt from memory matched the emulator's
   picture in all 104,448 pixels.
@@ -372,8 +398,8 @@ recipe in `orientation.md`, stepped by frames.
   colours, the heart froze the enemies and put the player in state
   `$18`, the umbrella `$14` took the game from round 1 to round 4, a
   potion opened a bonus room, the purple lamp and the crystal ball left
-  every enemy as food, and the door `$20` opened the secret room with 37
-  blocks counted.
+  every enemy as food, and the door `$20` opened the secret room, whose
+  counter read 37 for its 36 blocks.
 
 Not tested live: the giant foods, a second player, and the boss fight
 played through (its beaten state was forced).

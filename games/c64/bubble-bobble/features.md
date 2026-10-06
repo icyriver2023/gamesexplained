@@ -56,7 +56,7 @@ Lemon64 through the Wayback Machine and StrategyWiki refused the fetch
 | 100 rounds (manual, wiki) | confirmed | every per-round table has 100 entries; nine rounds rebuilt from the data match the running game (`facts.md`, "Live tests") |
 | A boss on round 100, beaten with thunder bubbles from a potion (wiki) | traced | `boss_round_setup` `$7F86`, `boss_hit_test` `$1134`, `boss_move` `$1D84`. The round and its nine-sprite boss were seen; the fight was not played |
 | "About 1,000,000 points" for round 100 (wiki) | live | `ending` `$A5B7` adds 1,000,000; forced live, the score went from 0 to 1,000,000 |
-| Secret doors at rounds 20, 30, 40, 80 and 90 if no life is lost; a room worth 432,000 points (wiki) | confirmed | `place_items` `$2B31`, `effect_secret_room` `$3621`: 36 blocks at 12,000 each. The door rounds follow from `next_door_level`. The room itself was seen live by forcing the door item in round 1 (`reference/secret-room.png`); no door was reached by play |
+| Secret doors at rounds 20, 30, 40, 80 and 90 if no life is lost; a room worth 432,000 points (wiki) | confirmed | `place_items` `$2B31`, `effect_secret_room` `$3621`: 36 blocks at 12,000 each (432,000, the wiki's figure). The door rounds follow from `next_door_level`. The room itself was seen live by forcing the door item in round 1 (`reference/secret-room.png`); no door was reached by play |
 | The door of round 50 leads to round 70 (wiki) | traced | `effect_skip_to_70` `$7C37` |
 | Super mode: hold S, U, P, O, R and the Commodore key on the title until the border flashes red (wiki, trainer menu) | live | `super_keys` `$45A7` in `start`: with the six keys held the border went red and the enemy lists were rewritten in memory, all 114 of kind 0 to kind 1 and all 72 of kind 6 to kind 5 |
 | Space switches between one and two players (wiki) | open | no test of the space key (row 7, column 4) was found: every read of `$DC01` in the listing was checked (`read_keys` `$7EB6`, `title_loop`, `start`). Joining is by fire (`check_rejoin`) |
@@ -76,8 +76,8 @@ Found in the code, not in the manual.
   pass, in two screen buffers with a character set each, flipped by the
   raster interrupt.
 - **Food rounds.** On rounds 1, 5, 10, 16, 23 and so on
-  (`next_food_round`, `$59BF`), every bubble left when the round is
-  cleared turns into falling food worth 700 points.
+  (`next_food_round`, `$59BF`), every full-size plain bubble left when
+  the round is cleared turns into falling food worth 700 points.
 - **Round 85 spells KIMI** in its platforms (seen live, `reference/round-85.png`).
 - **A layout is a bitmap, and more than half are stored as halves.**
   `unpack_layout` (`$E299`): 55 of the 100 rounds keep only their left

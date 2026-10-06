@@ -9,8 +9,9 @@ Run on 5 and 6 October 2026: macOS 15.6 on an Apple silicon Mac mini,
 Python 3.14.3, vice-mcp v3.13.2 (the macOS arm64 GUI release),
 regenerator2000 0.9.20 built with a Rust toolchain installed inside
 `tools/`, node 22 from Homebrew for the page's tests, kit 0.0.93, model
-claude-fable-5-1 throughout, one agent plus one checking agent for the
-listing sample.
+claude-fable-5-1 throughout: one agent, plus one checking agent for the
+listing samples and one for the audit of the routine comments, never
+two at once.
 
 ## Skill text that changed what I did
 
@@ -18,7 +19,7 @@ listing sample.
 - `50-coverage`: "Data the ledger cannot see": a script over the ledger found 6 KB of long tables past their symbols' reach before the figure was called 100 %.
 - `tool-regen2000`: "Code that indexes into I/O mints symbols in the RAM beneath": the colour RAM symbols sat on level layouts under the I/O area and were redescribed as layout bytes.
 - `60-verify`: "A test must contain cases that have to succeed": the page's level decoder was held to the running game's collision map cell for cell, which is how the unpacker's forced left wall was found.
-- `20-features`: "Test each control from a moment you have looked at": the first play snapshot had been saved mid-death and a fire test on it blew nothing; it was replaced by one taken with the player standing.
+- `60-verify`: "Measure the listing before calling it done": two samples of 60 comments each found one in six with a wrong detail, so every remaining routine comment was audited by a second agent and 99 of 367 were rewritten.
 
 ## What was changed in the kit
 

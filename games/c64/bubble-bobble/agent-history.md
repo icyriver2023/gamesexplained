@@ -81,6 +81,31 @@ nine and ten rounds. The burst scores, the chain bonus, the timer,
 EXTEND and round 100 were forced and measured. The first round-100 test
 poked `level` one too low and landed on round 99.
 
+**The listing sample was bad twice.** An agent that had written none of
+the comments checked 60 drawn at random and found 11 with a wrong
+detail, none wrong about what its subject is. Those were fixed, and the
+same slips looked for elsewhere, and a second sample of 60 came back
+with 10. Sixteen of the 21 were routine descriptions: units (frames,
+runs of the actor loop, passes of the main loop), which states a
+compare lets through, up for down, once for every time. Fixing by
+pattern had not moved the rate, so a fresh agent audited all 367
+routine comments not yet checked and rewrote 99. Its report also turned
+up a store of the wrong register in the game itself (`$F23C`).
+
+**A pass is three frames, not two.** The pass loop's own wait reads as
+two frames. A blown bubble sampled every frame changed every third, and
+non-stopping checkpoints then counted 100 passes in 300 frames: the
+buffer flip at the top of each pass waits for a frame of its own. The
+same trace showed the growth table is indexed by the counter before the
+decrement, because the routine's AND works on the value its caller
+loaded.
+
+**Two pictures showed nothing.** The first Baron screenshot was taken
+60 frames after the Baron's object appeared, during a jingle the game
+waits for inside its main loop, so no Baron had been drawn. The first
+EXTEND picture was a black frame between two scenes. Both were caught
+by looking at the built page, not by any check.
+
 **The page.** The decoders were rewritten in JavaScript inside
 `index.html` and compared with the Python ones for all 100 rounds by a
 node script in `work/`; a second script compared the drawn screen with
