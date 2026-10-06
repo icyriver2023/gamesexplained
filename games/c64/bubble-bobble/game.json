@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "platform": "c64",
+  "slug": "bubble-bobble",
+  "title": "Bubble Bobble",
+  "year": 1987,
+  "publisher": "Firebird",
+  "developer": "Software Creations",
+  "title_image": "reference/title.png",
+  "build": "Remember's crack of the disk version (\"cracked in August 2002\", +12 trainers, all left off), the one file BUBBLE BOBBLE+ of a T64 archive; the game starts at $4460",
+  "tier": "bronze",
+  "coverage_percent": 100.0,
+  "copy": "agent-draft",
+  "steward": "",
+  "credits": [
+    {
+      "by": "Stephen Ruddy",
+      "role": "programmer"
+    },
+    {
+      "by": "Andrew Threlfall",
+      "role": "graphics"
+    },
+    {
+      "by": "Peter Clarke",
+      "role": "music"
+    }
+  ],
+  "tools": {
+    "emulator": "VICE via vice-mcp: release v3.13.2, v3.13.2-macos-arm64-gui.dmg (x64sc, PAL; host sound device set to dummy)",
+    "disassembler": "regenerator2000 0.9.20",
+    "python": "3.14.3",
+    "host": "macOS 15.6 arm64 (Mac mini)"
+  },
+  "model": "claude-fable-5-1",
+  "step_models": {
+    "50-coverage": [
+      "claude-fable-5-1"
+    ]
+  },
+  "kit_version": "0.0.93",
+  "created": "2026-10-05",
+  "video": {
+    "screen": "$5000",
+    "charset": "$4000"
+  },
+  "coverage": {
+    "exclude": [
+      [
+        "$0200",
+        "$03FF",
+        "the table of multiples of eight, built by the start-up; zero as loaded"
+      ],
+      [
+        "$4800",
+        "$4FFF",
+        "the second character set, built at run time; as loaded it holds the cracker's copy of $0400-$07FF and zeros"
+      ],
+      [
+        "$5000",
+        "$53FF",
+        "the first screen buffer; as loaded it holds the text and the first part of the cracker's trainer menu, which the game's first screen clear wipes"
+      ],
+      [
+        "$5400",
+        "$57FF",
+        "the second screen buffer; as loaded it holds the rest of the cracker's trainer menu code"
+      ],
+      [
+        "$7C40",
+        "$7E7F",
+        "sprite buffers built at run time (mirrored boss, food and bonus sprites); zero as loaded"
+      ],
+      [
+        "$8488",
+        "$897F",
+        "the collision map, its wrap rows and the actor arrays kept in its spare columns; zero as loaded"
+      ],
+      [
+        "$8DE2",
+        "$8F05",
+        "the tail of the clean screen copy; zero as loaded"
+      ]
+    ],
+    "extra": [],
+    "include": [
+      [
+        "$D000",
+        "$DFFF",
+        "level layouts in the RAM under the I/O area, read with $01 = $30"
+      ]
+    ]
+  },
+  "io": [],
+  "regions": [],
+  "links": {
+    "wiki": "https://www.c64-wiki.com/wiki/Bubble_Bobble",
+    "manual": ""
+  }
+}
