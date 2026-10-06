@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{title}}</title>
+<title>Bubble Bobble</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -34,33 +34,496 @@ h2.t{font-size:var(--h2);margin-bottom:12px}
 .cap b{color:var(--ink);font-weight:700}
 code{font-family:var(--fm);font-size:.82em;background:var(--chip);color:var(--chip-ink);border-radius:4px;padding:2px 6px;white-space:nowrap}
 
+.bb-row{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.bb-side{flex:1;min-width:240px;font-size:14.5px;line-height:1.5}
+.bb-side dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+.bb-side dt{color:var(--ink-mute);font-family:var(--fm);font-size:12px;padding-top:2px}
+.bb-side dd{margin:0}
+.bb-toggles{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 14px;font-size:14px}
+.bb-toggles label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.bb-canvas{background:#000;border-radius:4px;max-width:100%;height:auto}
+.bb-table{border-collapse:collapse;width:100%;font-size:14.5px}
+.bb-table th,.bb-table td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+.bb-table th{font-family:var(--fm);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);font-weight:500}
+.bb-table td canvas{background:#000;border-radius:3px;display:block}
+.bb-num{font-family:var(--fm);font-size:13px}
+.bb-enemies{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.bb-enemies canvas{background:#000;border-radius:3px}
+.bb-stage{display:grid;grid-template-columns:repeat(4,auto);gap:14px 22px;justify-content:start;align-items:end;font-family:var(--fm);font-size:12px;color:var(--ink-mute)}
+.bb-stage canvas{background:#000;border-radius:3px;display:block;margin-bottom:6px}
+.bb-big{font-size:30px;font-weight:900;font-family:var(--fd)}
+.bb-foods{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.bb-foods div{font-family:var(--fm);font-size:12px;text-align:center;color:var(--ink-soft)}
+.bb-foods canvas{background:#000;border-radius:3px;display:block;margin:0 auto 4px}
+.bb-shot{max-width:100%;border-radius:4px;display:block}
+.bb-two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.bb-two{grid-template-columns:1fr}.bb-stage{grid-template-columns:repeat(2,auto)}}
+input[type=range]{width:220px;vertical-align:middle}
 </style>
-<!--
-  Template for a game article. Keep it self-contained: inline CSS and JS,
-  fonts are the only external resource, opens from disk. The section below
-  shows the parts a section is made of, not which section comes first: the
-  kinds of section are listed in kit/skills/core/70-minisite, in no order,
-  and this page's order is its own. The best thing to press or hear goes
-  as high as the explanation lets it, and every section should have
-  something the reader can press. Copy follows kit/style.md and is written
-  last.
--->
 <!-- tabs -->
 <header class="hero">
-  <p class="eyebrow">{{platform}} · {{year}} · {{publisher}}</p>
-  <h1>{{title}}</h1>
-  <p class="sub">One sentence a human wrote about what is interesting inside this game.</p>
+  <p class="eyebrow">Commodore 64 · 1987 · Firebird</p>
+  <h1>Bubble Bobble</h1>
+  <p class="sub">Stephen Ruddy's conversion draws every bubble into the character set on the fly, keeps a hundred rounds in under seven kilobytes of bitmaps, and hides part of them underneath the video chip.</p>
 </header>
 <main class="wrap">
+
 <section>
-  <p class="fig">01 · What this section explains</p>
-  <h2 class="t">The finding, spelled out</h2>
-  <p class="lede">What a player would notice, in a sentence or two.</p>
-  <div class="plate"><canvas id="cv" width="320" height="200"></canvas><p class="cap">Caption: what the reader is looking at, and where the bytes came from.</p></div>
-  <p>The explanation, with the bytes, the table or the register beside each claim.</p>
+  <p class="fig">01 · The rounds</p>
+  <h2 class="t">All 100 rounds, drawn from 6,670 bytes</h2>
+  <p class="lede">A round is a bitmap, one bit for each of its 32 by 23 cells. More than half the rounds store only their left side.</p>
+  <div class="plate">
+    <div class="pick"><a class="step" id="bb-prev">‹</a><select id="bb-round"></select><a class="step" id="bb-next">›</a></div>
+    <div class="bb-toggles">
+      <label><input type="checkbox" id="bb-t-air"> air currents</label>
+      <label><input type="checkbox" id="bb-t-half"> the half that is stored</label>
+      <label><input type="checkbox" id="bb-t-items" checked> item places</label>
+      <label><input type="checkbox" id="bb-t-super"> super mode</label>
+    </div>
+    <div class="bb-row">
+      <canvas id="bb-map" class="bb-canvas" width="512" height="400"></canvas>
+      <div class="bb-side">
+        <dl id="bb-info"></dl>
+        <div class="bb-enemies" id="bb-cast"></div>
+      </div>
+    </div>
+    <p class="cap"><b>Drawn by this page from the game's bytes</b> (the Source tab's listing), with the game's own unpacking rules. The decoder was checked against the running game: for rounds 1, 2, 16, 40, 41, 57, 77, 85, and 99 every one of the 800 cells of the game's collision map matched, and for ten rounds every cell's air current. Dots mark where each enemy enters. The outlined squares are where the round's points item (white) and special item (yellow) appear.</p>
+  </div>
+  <p>The layouts start at <code>$C5F2</code> and are packed end to end. A full layout takes 92 bytes, four for each of 23 rows. A mirrored round keeps two bytes a row, and <code>$E32A</code> writes the other two as their mirror image, bit by bit. Whether a round is mirrored is the top bit of its byte in the table at <code>$FF94</code>; the other seven bits choose one of 59 two-by-two blocks for the side walls. The platforms use a single glyph per round, eight bytes from <code>$C26E</code>, and the two colours come from <code>$FF30</code>. The top and bottom rows are not stored at all: two bits each in <code>$C58E</code> say whether they have openings.</p>
+  <p>Round 85 spells KIMI in its platforms.</p>
+  <p>The 100 layouts end exactly at <code>$DFFF</code>, so the last 4 KB lie in the RAM under the video and sound chips. The unpacker at <code>$E299</code> switches the chips out of the address space for the copy and back in afterwards.</p>
+  <p>Each round also has an invisible map of air currents, which is what makes a bubble drift along its own route to the place where bubbles gather. The data at <code>$B695</code> is a list of rectangles, each with one of four directions, and a one-byte order to mirror the left half onto the right with left and right swapped. A plain bubble moves the way the cell under it points (<code>$0CF2</code>).</p>
+  <p>Super mode is the game's hidden hard setting. The loop that waits for fire on the title page also checks whether S, U, P, O, R, and the Commodore key are all down (<code>$45A7</code>). If they are, the border flashes red and the code walks every enemy list in memory, turning each wind-up robot into the fire-breather and each boulder-thrower into the bottle-thrower. The checkbox above applies the same rewrite. In the running game it changed 186 enemies: all 114 robots and all 72 boulder-throwers.</p>
 </section>
+
+<section>
+  <p class="fig">02 · The picture</p>
+  <h2 class="t">Bubbles are characters, redrawn into fresh glyphs every pass</h2>
+  <p class="lede">The eight sprites go to the two dragons and six enemies. Everything else that moves is drawn by rewriting the character set.</p>
+  <div class="plate">
+    <div class="bb-toggles">
+      <label>object <select id="bb-pic"></select></label>
+      <label>shift <input type="range" id="bb-shift" min="0" max="3" value="0"> <span id="bb-shift-v" class="bb-num">0</span></label>
+    </div>
+    <div class="bb-stage">
+      <div><canvas id="bb-s-bg" width="144" height="96"></canvas>what the cells show now</div>
+      <div><canvas id="bb-s-mask" width="144" height="96"></canvas>AND the mask</div>
+      <div><canvas id="bb-s-gfx" width="144" height="96"></canvas>OR the picture</div>
+      <div><canvas id="bb-s-out" width="144" height="96"></canvas>six new glyphs</div>
+    </div>
+    <p class="cap"><b>The renderer's merge</b>, done by this page with the pictures and masks at <code>$8000</code>-<code>$9ADF</code>, over round 1's wall tile. A picture is 24 pixels wide and 16 high, stored as three columns of 16 bytes, one column per character cell. Each picture exists in four versions shifted two pixels apart, which is how a bubble moves in steps finer than a cell.</p>
+  </div>
+  <p>Up to eighteen objects are alive at once: bubbles, the letters, shots, flames, the Barons. Every pass, <code>$E90E</code> hands each object nine unused character codes, starting at <code>$5E</code>. For each cell the object touches, <code>$E7CF</code> reads the glyph already on screen there, masks the object's shape out of it, ORs the picture in, and writes the result as one of the new glyphs. Then it puts the new character code into the screen cell. A bubble passing in front of a platform is therefore a set of glyphs that are part platform and part bubble.</p>
+  <p>The game keeps two screens and two character sets and draws into the pair that is not on display. The raster interrupt at <code>$072E</code> switches <code>$D018</code> between them. Before drawing, <code>$1853</code> repairs the hidden screen from a clean copy of the round kept at <code>$8B00</code>, restoring only the cells that objects covered two passes earlier.</p>
+  <div class="plate">
+    <canvas id="bb-frame" class="bb-canvas"></canvas>
+    <p class="cap"><b>One frame of round 1, rebuilt from memory</b> by the site's model of the video chip from a recording of the registers and RAM. Compared with the emulator's own picture of the same frame, all 104,448 pixels match. The bubbles are characters <code>$5E</code> and up; only the dragon and the three robots are sprites.</p>
+  </div>
+</section>
+
+<section>
+  <p class="fig">03 · Special bubbles</p>
+  <h2 class="t">What the three special bubbles release</h2>
+  <p class="lede">Seventy of the hundred rounds have vents at the top and bottom of the screen that send in bubbles of their own.</p>
+  <div class="bb-two">
+    <div class="plate"><img class="bb-shot" src="reference/water-stream.png" alt="A water stream"><p class="cap">Water: a stream ten cells long that falls, then runs along the floor.</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/fire-run.png" alt="A fire run"><p class="cap">Fire: a flame that drops and spreads along the floor it lands on.</p></div>
+  </div>
+  <p>Every 22 passes a vent may release a bubble, as long as fewer than ten special bubbles are afloat (<code>$0BED</code>). The round's data says which kinds it may be: water in 14 rounds, fire in 21, thunder in 8. Bursting any of them scores 100 points and sets its contents loose (<code>$3D2D</code>).</p>
+  <p>Water becomes a stream whose head moves a cell at a time: down while nothing is under it, then sideways along the floor, then down again at the edge (<code>$1B40</code>). Whatever the head touches is carried with it. An enemy carried off the bottom of the screen counts as beaten. A player is set down unharmed.</p>
+  <p>Fire becomes a flame that falls half a cell a pass. Where the flame lands, a row of fire spreads up to 16 cells to each side, by a random amount, and burns down through six stages (<code>$11B7</code>, <code>$1319</code>). An enemy standing in the row while it burns high is beaten.</p>
+  <p>Thunder becomes a bolt that flies level, away from the side the player is facing, and beats every enemy in its path (<code>$10D6</code>). The bolt is also the only thing that hurts the boss of round 100.</p>
+  <div class="plate"><img class="bb-shot" src="reference/extend.png" alt="The EXTEND scene"><p class="cap">The scene that plays when one player holds all six letters. It was reached in the running game by setting the six letter bits, and it added a life and moved on to the next round.</p></div>
+  <p>The same vents hand out the letters of EXTEND. When a round with vents is set up, the game tosses a coin. On heads, the first one to four bubbles from the vents are letters, and the vents go back to their usual bubbles afterwards (<code>$0C9C</code>). Only five letter bubbles exist: the E counts as the first E for a player who has none and as the second for a player who has one.</p>
+</section>
+
+<section>
+  <p class="fig">04 · The cast</p>
+  <h2 class="t">The eight kinds of enemy</h2>
+  <p class="lede">Each round's list gives every enemy a kind from 0 to 7, and the kind picks a picture and a routine.</p>
+  <div class="plate">
+    <table class="bb-table" id="bb-kinds"></table>
+    <p class="cap"><b>Sprites drawn from the game's own data</b> at <code>$5CC0</code>-<code>$703F</code>, in the colours of the table at <code>$AB63</code>. "First round" and "in all" are counted from the 100 enemy lists at <code>$AE51</code>, which hold 572 enemies.</p>
+  </div>
+  <p>An enemy record is three bytes: its kind and column, its row and heading, and how long it waits before it moves. The six sprites not used by the players limit a round to six enemies.</p>
+  <p>The walkers share one routine (<code>$EA08</code>). An enemy on the same level as its player just walks. One below its player keeps a timer, and each time the timer runs out the enemy changes its mind about whether to climb; while it wants to, it jumps for any platform it finds overhead. Three of the walkers also shoot along their row when they face a player who is level with them (<code>$EDCD</code>).</p>
+  <p>Enemies and players never use the video chip's collision registers. Every test is a comparison of coordinates: a player dies within 12 pixels of an enemy (<code>$1D32</code>), and a bubble catches an enemy within 16 (<code>$105B</code>).</p>
+</section>
+
+<section>
+  <p class="fig">05 · Scoring</p>
+  <h2 class="t">What a chain of burst enemies pays</h2>
+  <p class="lede">A burst bubble bursts every bubble within 24 pixels of it, and those burst their neighbours in turn.</p>
+  <div class="plate">
+    <div class="bb-toggles"><label>enemies burst in one chain <input type="range" id="bb-chain" min="1" max="6" value="3"> <span id="bb-chain-v" class="bb-num">3</span></label></div>
+    <div class="bb-row">
+      <div><div class="fig">chain bonus</div><div class="bb-big" id="bb-chain-bonus"></div></div>
+      <div><div class="fig">food they leave</div><div class="bb-foods" id="bb-chain-foods"></div></div>
+      <div><div class="fig">all eaten</div><div class="bb-big" id="bb-chain-total"></div></div>
+    </div>
+    <p class="cap"><b>The tables at <code>$AB52</code> and <code>$A79A</code>.</b> The bonus is paid when the chain stops growing. Each beaten enemy then lands as food, and the later it was in the chain the better the food. Bursting one held enemy scored 1,000 in the running game, and the food it left was the first of the row.</p>
+  </div>
+  <table class="bb-table">
+    <tr><th>Event</th><th>Points</th></tr>
+    <tr><td>Bursting a plain or letter bubble</td><td class="bb-num">10</td></tr>
+    <tr><td>Bursting a water, fire, or thunder bubble</td><td class="bb-num">100</td></tr>
+    <tr><td>A points item</td><td class="bb-num">10 to 12,000</td></tr>
+    <tr><td>Food from a leftover bubble on a food round</td><td class="bb-num">700</td></tr>
+    <tr><td>A block in a bonus room</td><td class="bb-num">500</td></tr>
+    <tr><td>Taking every block in a bonus room</td><td class="bb-num">100,000</td></tr>
+    <tr><td>A block in a secret room</td><td class="bb-num">12,000</td></tr>
+    <tr><td>Round 100</td><td class="bb-num">1,000,000</td></tr>
+  </table>
+  <p>A score is three bytes of packed decimal, and the screen prints a fixed zero after them, so nothing in the game can score fewer than ten points. Extra lives come at 30,000, 100,000, 400,000, 1,000,000, and each million after that (<code>$F1AC</code>).</p>
+  <p>The manual's figures differ from the code's. The manual promises 500 points for a boxed-up enemy and food up to a 32,000-point diamond. The code pays 1,000 for the burst, and its best food is worth 9,000.</p>
+  <p>On rounds 1, 5, 10, 16, 23, 31, 40, 50, 61, 73, 86, and 100, every bubble still floating when the round is cleared turns into food worth 700 points and falls (<code>$0EC5</code>). The gap between such rounds grows by one each time (<code>$59BF</code>).</p>
+</section>
+
+<section>
+  <p class="fig">06 · The clock</p>
+  <h2 class="t">Thirty seconds to "hurry up", ten more to the Barons</h2>
+  <p class="lede">The round timer counts real seconds, one for every 50 frames.</p>
+  <div class="bb-two">
+    <div class="plate"><img class="bb-shot" src="reference/hurry-up.png" alt="Round 1 with the HURRY UP banner"><p class="cap">The banner, 30 seconds into round 1.</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/baron.png" alt="Round 1 with a Baron"><p class="cap">Ten seconds later a Baron arrives for each player.</p></div>
+  </div>
+  <p>The bottom raster interrupt takes one from the timer every 50 frames (<code>$06AB</code>). Most rounds start it at 30. Round 56 starts at 10, and every round from 57 on at 20 (<code>$392A</code>). In the running game the banner came 1,500 frames after play began and the Barons 500 frames after that.</p>
+  <p>When the timer runs out, every enemy turns angry: its routine gets an extra run on every second turn, which makes the enemy half as fast again. When the timer runs out again, each player gets a Baron of their own (<code>$1473</code>). A Baron moves through walls in straight runs towards its player, first along one axis and then the other, pausing 30 passes between runs. Each run is one cell longer than the last, up to 15. No routine removes a Baron except the death of its player or the end of the round.</p>
+  <p>A cleared round also uses the timer. When the last enemy is beaten the timer is set to nine seconds, and the seconds that were left decide how good the next round's points item will be (<code>$16F7</code>).</p>
+</section>
+
+<section>
+  <p class="fig">07 · Items</p>
+  <h2 class="t">What each special item does</h2>
+  <p class="lede">Every round has one special item, due 1 to 16 seconds in. Its number picks a routine from a table of 35.</p>
+  <div class="plate">
+    <table class="bb-table" id="bb-items"></table>
+    <p class="cap"><b>Pictures drawn from the item graphics at <code>$9AE0</code></b> in the colours of the table at <code>$A913</code>; effects read from the routines the table at <code>$2D65</code> points to. The names describe the pictures. The game stores none.</p>
+  </div>
+  <p>Nine times in sixteen a round's item is the one tied to its round number. Otherwise it is usually drawn at random from the first 32 (<code>$2B31</code>).</p>
+  <div class="bb-two">
+    <div class="plate"><img class="bb-shot" src="reference/flood.png" alt="The flood"><p class="cap">The cyan cross: the round fills from the bottom and every enemy is beaten.</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/bonus-room.png" alt="A bonus room"><p class="cap">A potion: the round becomes a bonus room with 30 seconds on the clock.</p></div>
+  </div>
+  <p>The three crosses do not match the descriptions that circulate for this version. By their stored colours, the red cross gives 19 fireballs in place of bubbles, the yellow one flashes the screen and sends a block falling across it that kills what it passes, and the cyan one floods the round from the bottom up and kills every enemy.</p>
+</section>
+
+<section>
+  <p class="fig">08 · Memory</p>
+  <h2 class="t">Secret: the title page can only ever play once</h2>
+  <p class="lede">After the first game, the game returns to its score table and never to the title.</p>
+  <div class="bb-two">
+    <div class="plate"><img class="bb-shot" src="reference/title.png" alt="The title page"><p class="cap">Shown once, with its own tune.</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/player-select.png" alt="The score table"><p class="cap">The screen every later game starts from.</p></div>
+  </div>
+  <p>The program fills the machine from <code>$0400</code> to <code>$FFFF</code>, and the title page is what it gives up to make room. The code that draws the title and waits for fire starts at <code>$4460</code>, inside the character set, next to the glyphs of the big lettering. The first round's graphics are written over both. The title's tune sits at <code>$8B00</code>, in the kilobyte that becomes the clean copy of the screen as soon as a round is drawn.</p>
+  <p>The same economy shows elsewhere. A sprite is 63 bytes in a 64-byte slot, and fifteen of the game's variables live in the spare bytes, from <code>$587F</code> to <code>$5C3F</code>. The collision map is 40 bytes wide for a playfield of 32 columns, and the eight spare bytes of each row hold one value for each of the eight actors (<code>$8520</code>).</p>
+</section>
+
+<section>
+  <p class="fig">09 · Doors</p>
+  <h2 class="t">Secret: a player who has not died is offered doors</h2>
+  <p class="lede">Six rounds can replace their special item with a door.</p>
+  <div class="plate">
+    <table class="bb-table">
+      <tr><th>The door appears in round</th><th>It leads to</th></tr>
+      <tr><td class="bb-num">20, 30, 40, 80, 90</td><td>a secret room: 37 blocks worth 12,000 points each</td></tr>
+      <tr><td class="bb-num">50</td><td>round 70</td></tr>
+    </table>
+    <p class="cap"><b>From the item placer at <code>$2B31</code></b> and the two door routines, <code>$3621</code> and <code>$7C37</code>.</p>
+  </div>
+  <div class="plate"><img class="bb-shot" src="reference/secret-room.png" alt="The secret room"><p class="cap">The secret room, entered in the running game by putting the door item on the player in round 1. The room counted 37 blocks.</p></div>
+  <p>The game keeps one bit for each player who has not yet lost a life (<code>$5B7F</code>). While either bit is set, the round after each door threshold gets a door in place of its usual item. The thresholds are rounds 19, 29, 39, and 49, then 79 and 89.</p>
+  <p>The secret room is round 77's layout, redrawn with glyphs of its own, which also spell out a message (<code>$A660</code>). Its way out opens when one block is left, so a room is worth 36 blocks, or 432,000 points.</p>
+</section>
+
+<section>
+  <p class="fig">10 · Round 100</p>
+  <h2 class="t">The boss gets back up</h2>
+  <p class="lede">Beating the boss takes two steps, and the second has a time limit.</p>
+  <div class="bb-two">
+    <div class="plate"><img class="bb-shot" src="reference/round-100-boss.png" alt="Round 100"><p class="cap">Round 100. The boss is nine sprites, drawn with six: a third raster interrupt moves three of them down for the bottom row (<code>$0795</code>).</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/ending.png" alt="The ending"><p class="cap">The ending, reached in the running game by forcing the boss's beaten state.</p></div>
+  </div>
+  <p>Round 100's potion turns every bubble the player blows into a thunder bubble. Fifty bolts put the boss into a beaten state that lasts 130 passes of the main loop (<code>$1134</code>). A player who touches the boss in that time ends the game with a million points (<code>$A5B7</code>). If nobody does, the boss gets up, needs 40 more bolts, and moves at twice the speed.</p>
+  <p>The ending prints its three lines over a star field and walks the top two rows of the boss to and fro beneath them. It is the same whether one or two played.</p>
+</section>
+
 </main>
-<footer style="margin:16px 0 0;padding:22px var(--gx) 0;border-top:1px solid #e0ded8;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:12px;color:#80838a"><a href="/kit.html" style="color:#1f5fa8;text-decoration:none">Kit changelog</a> · <a href="https://github.com/gamesexplained/gamesexplained" style="color:#1f5fa8;text-decoration:none">GitHub</a> · <a href="https://discord.gg/3V9GWyRDWV" style="color:#1f5fa8;text-decoration:none">Discord</a><br>© Games Explained contributors. Write-ups, facts and symbol maps are available under <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:#1f5fa8;text-decoration:none">CC BY-SA 4.0</a>; code under <a href="https://opensource.org/licenses/MIT" style="color:#1f5fa8;text-decoration:none">MIT</a></footer>
+<footer style="margin:16px 0 0;padding:22px var(--gx) 0;border-top:1px solid #e0ded8;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:12px;color:#80838a"><a href="/kit.html" style="color:#1f5fa8;text-decoration:none">How this page was made</a></footer>
+<script src="../../lib/c64.js"></script>
+<script id="bb-core">
+// The game's level data, decoded the way the game decodes it. Pure functions of a 64 KB image.
+const BB = (function () {
+  const rev = b => { let r = 0; for (let i = 0; i < 8; i++) if (b & (1 << i)) r |= 0x80 >> i; return r; };
+  const half = (ram, lv) => !!(ram[0xFF94 + lv] & 0x80);
+  function layoutAddr(ram, lv) {            // unpack_layout $E299: 46 bytes for a mirrored round, 92 otherwise
+    let a = 0xC5F2;
+    for (let i = 0; i < lv; i++) a += half(ram, i) ? 46 : 92;
+    return a;
+  }
+  function layoutRows(ram, lv) {            // 25 rows of four bytes, as the game leaves them at $8B00
+    const a = layoutAddr(ram, lv), g = ram[0xC58E + lv], h = half(ram, lv);
+    const gap = (l, r) => [0xFF, l ? 0x87 : 0xFF, r ? 0xE1 : 0xFF, 0xFF];
+    const rows = [gap(g & 1, g & 2)];
+    for (let r = 0; r < 23; r++) {
+      if (h) { const b0 = ram[a + 2 * r], b1 = ram[a + 2 * r + 1]; rows.push([b0, b1, rev(b1), rev(b0)]); }
+      else rows.push([ram[a + 4 * r], ram[a + 4 * r + 1], ram[a + 4 * r + 2], ram[a + 4 * r + 3]]);
+    }
+    rows.push(gap(g & 4, g & 8));
+    for (let r = 1; r < 24; r++) rows[r][0] |= 0xC0;      // the left wall, forced on as the unpacker does
+    rows[0][3] = (rows[0][3] & 0xFC) | ((g >> 4) & 3);
+    rows[24][3] = (rows[24][3] & 0xFC) | ((g >> 6) & 3);
+    return rows;
+  }
+  function walls(ram, lv) {                 // 25 x 32 booleans: a solid cell
+    return layoutRows(ram, lv).map(row => {
+      const bits = [];
+      for (const b of row) for (let i = 0; i < 8; i++) bits.push(!!(b & (0x80 >> i)));
+      bits[0] = bits[1] = bits[30] = bits[31] = true;
+      return bits;
+    });
+  }
+  function screen(ram, lv) {                // draw_layout $E09B: character codes, 25 x 32, with the shadows
+    const rows = layoutRows(ram, lv), S = [];
+    for (let r = 0; r < 27; r++) S.push(new Array(42).fill(0x20));
+    for (let r = 0; r < 25; r++) for (let x = 0; x < 32; x++) {
+      if (!(rows[r][x >> 3] & (0x80 >> (x & 7)))) continue;
+      S[r][x] = 0x15;
+      const t = S[r][x + 1];
+      S[r][x + 1] = t === 0x20 ? 0x0C : (t === 0x0A || t === 0x0D) ? 0x0F : 0x0E;
+      S[r + 1][x] = S[r + 1][x] === 0x20 ? 0x0A : 0x0D;
+      S[r + 1][x + 1] = 0x0B;
+    }
+    for (let r = 0; r < 25; r++) {
+      const top = !(r & 1);
+      S[r][0] = S[r][30] = top ? 0x16 : 0x18;
+      S[r][1] = S[r][31] = top ? 0x17 : 0x19;
+    }
+    for (let x = 0; x < 32; x++) if (S[0][x] === 0x0C) S[0][x] = 0x0E;
+    return S.slice(0, 25).map(r => r.slice(0, 32));
+  }
+  function airRecord(ram, lv) {
+    let a = 0xB695;
+    for (let i = 0; i < lv; i++) { const b = ram[a]; a += (b & 0x80 || b === 0) ? 1 : b; }
+    return a;
+  }
+  function air(ram, lv) {                   // build_air_currents $E189: 25 x 32 directions, 0 up 1 right 2 down 3 left
+    let a;
+    for (;;) { a = airRecord(ram, lv); if (ram[a] & 0x80) lv = ram[a] & 0x7F; else break; }
+    const rows = layoutRows(ram, lv), m = rows.map(r => new Array(32).fill(r[3] & 3)), n = ram[a];
+    if (!n) return m;
+    for (let y = 1; y !== n && y < 251;) {
+      const b = ram[a + y];
+      if (b & 0x80) {
+        const d = (b >> 5) & 3, col = b & 0x1F, b1 = ram[a + y + 1], b2 = ram[a + y + 2];
+        y += 3;
+        const row = b1 >> 3, w = (((b1 & 7) << 2) | (b2 >> 6)) + 1, h = (b2 & 0x1F) + 1;
+        for (let r = row; r < row + h && r < 25; r++) for (let c = col; c < col + w && c < 32; c++) m[r][c] = d;
+      } else {
+        y += 1;
+        for (let r = 0; r < 25; r++) for (let c = 0; c < 16; c++) { const v = m[r][c]; m[r][31 - c] = (v & 1) ? v ^ 2 : v; }
+      }
+    }
+    return m;
+  }
+  function enemies(ram, lv, superMode) {    // start_round $392A; superMode applies the rewrite at $45E3
+    let a = 0xAE51;
+    for (let i = 0; i < lv; i++) { while (ram[a]) a += 3; a += 1; }
+    const out = [];
+    for (; ram[a]; a += 3) {
+      const b0 = ram[a], b1 = ram[a + 1], b2 = ram[a + 2];
+      let kind = b0 & 7;
+      if (superMode) kind = kind === 0 ? 1 : kind === 6 ? 5 : kind;
+      out.push({ kind, x: (b0 & 0xF8) + 0x14, y: (b1 & 0xF8) + 0x15, wait: (b2 & 0x3F) * 2, left: !!(b2 & 0x40) });
+    }
+    return out;
+  }
+  function items(ram, lv) {                 // place_items $2B31: cell of the points item and of the special item
+    const a = ram[0xB569 + lv], b = ram[0xB5CD + lv], c = ram[0xB631 + lv];
+    return { points: { col: a >> 3, row: ((a & 7) << 2) | (b >> 6) },
+             special: { col: (b & 0x3E) >> 1, row: ((b & 1) << 4) | (c >> 4) },
+             vents: !!(c & 1), water: !!(c & 2), fire: !!(c & 4), thunder: !!(c & 8) };
+  }
+  return { rev, half, layoutAddr, layoutRows, walls, screen, air, airRecord, enemies, items };
+})();
+if (typeof module !== 'undefined') module.exports = BB;
+</script>
 <script>
-// Inline everything. Data extracted from the snapshot goes here as arrays.
+// bb-frame-data: one recorded frame, trimmed to the memory the drawing reads (kit/c64/frame.py trim)
+const BB_FRAME = /*FRAME*/{"schema":1,"standard":"PAL","lines":312,"cycles":63,"about":"","vic":[118,221,0,0,180,214,102,221,74,221,0,21,0,21,0,21,0,27,0,209,0,255,216,0,65,112,241,0,255,0,255,31,240,240,242,241,242,242,241,245,243,254,252,252,240,240,240],"cia2":[150,63],"cpu":[47,53],"writes":[[52,7,65534,171],[52,11,65535,6],[256,2,53256,76],[257,1,21500,118],[257,6,22524,118],[257,24,53254,104],[258,23,21499,117],[258,28,22523,117],[258,46,53252,187],[273,8,65534,46],[273,12,65535,7]],"colour":"CQkNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0CAgICAgICDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NBwcHDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0FBQUFBQUFDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQUFBQUFBQUNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQICAgICDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQcHBw0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NAwMDAwMDAw0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0DAwMDAwMDDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0CAgICAg0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0HBwcNDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0BAQEBAQEBDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQICAgICAgINDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0DAwMDAwMDDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NAw0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ==","ram":[{"a":16384,"b":"PmNjY2NjPgAIGDgYGBg8ADxmBgwYMH4APEYGHAZGPAAOHjZmfwYGAHxgfAYGZjwAHDB8ZmZmPAB+BgwYGBgY"},{"a":16456,"b":"PGZmZj4GPAAAVRUFAAAAABRUVFQAAAAAEBAUFBQUFBQAVVVVAAAAABQUFBQUFBQUABUVFRQUFBRaaaWWWmmlllpppZZaaaWWWmmlllpppZZaaaWWWmmlllpppZZaaaWW"},{"a":16592,"b":"AAAAAAAApZYw8DAw/ACllg=="},{"a":16616,"b":"AB4/Pz8/HgAAAP8AAP8AAA=="},{"a":16640,"b":"AAAAAAAAAAA="},{"a":16664,"b":"PGZgYGBmPAB4bGZmZmx4AH5gYHhgYH4A"},{"a":16712,"b":"fhgYGBgYfgA="},{"a":16760,"b":"PGZmZmZmPAB8ZmZmfGBgAA=="},{"a":16784,"b":"fGZmfHhsZgA8ZnA8DmY8AH4YGBgYGBgAZmZmZmZmPAA="},{"a":17136,"b":"AwAAAAAAAAD//zwAAAAAAMAAAAAAAAAAAw8PDw8PDwOvr////////8Dw8PDw8PDAAAAAAAAAAAMAAAAAADz/rwAAAAAAAADAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAA1dXVwMAAAD/////////P/z9/f388PDAWmmlllpppZdaaaWff+vr61pppZba+fX+////Pz8/DwP////8/PzwwAAAAAAAAAAAAw8/Ojr6///A8Pz8/P///wAAAAAAAAAA"},{"a":20480,"b":"GhsQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQERIgICAgICAgIBMUDw0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDRMUICAgICAgICAREg4gICAgICAgICAgICAgICAgICAgICAgICAgICAREiAeHh4eHh4eExQOICAgICAgICAgICAgICAgICAgICAgICAgICAgExQgICAgICAgIBESDiAgICAgICAgICAgICAgICAgICAgICAgICAgIBESICAgATUwICATFA4gICAgICAgICAgICAgICAgICAgICAgICAgICATFCAgICABAAAAERIOICAgICAgICAgICAgICAgICAgICAgICAgICAgERIgICAgICAgIBMUDiAgICAgICAgICAgICAgICAgICAgICAgICAgIBMUICAgICAdHR0REg4gICAgICAgICAgICAgICAgICAgICAgICAgICAREiAgICAgICAgExQQEAwgIBAQEBAQEBAQEBAQEBAQEBAQEAwgIBAQExQgIB4eHh4eIBESDw0LICAKDQ0NDQ0NDQ0NDQ0NDQ0NDQ0LICAKDRESICAgICAgICATFA4gICAgICAgICAgICAgZGVmICAgICAgICAgICATFCAgIAI1MCAgERIOICAgICAgICAgICAgIGFiYyAgICAgICAgICAgERIgICAgICAAABMUDiAgICAgICAgICAgICBeX2AgICAgICAgICAgIBMUICAgICAgICAREhAQDCAgEBAQEBAQEBAQEBAQEG1ubxAQDCAgEBAREiAgICAgHR0dExQPDQsgIAoNDQ0NDQ0NDQ0NDQ1qa2wNDQsgIAoNExQgICAgICAgIBESDiAgICAgICAgICAgICAgICAgZ2hpICAgICAgIBESICAeHh4eHiATFA4gICAgICAgICAgICAgICAgICAgICAgc3R1ICATFCAgICAgICAgERIOICAgICAgICAgICAgICAgICAgICAgIHBxciAgERIgICA0LzAgIBMUEBAMICAQEBAQEBAQEBAQEBAQEBAQEBAMICAQEBMUICAgICAgICAREg8NCyAgCg0NDQ0NDQ0NDQ0NDQ0NDQ0NCyAgCg0REiAgIAIAAAAAExQOICAgICAgICAgICAgICAgICAgICAgICAgICAgExQgICAgICAgIBESDiAgICAgICAgICAgICAgICAgICAgICAgICAgIBESIB4eHh4eHh4TFA4gICAgICAgICAgICAgICAgICAgICAgICAgICATFCAjMiUkKTQzERIQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQERIgICAgCSAgIA=="},{"a":21496,"b":"ZWR9dHUAAAA="},{"a":22784,"b":"AAAAAAAAAAAAAAAAADAAAKgAAqoACqr8C7qwDI6ADI68DI6wC7qACqi8AMKwCqpQAvpQC/6gCfWgBfVoBa1q"},{"a":22848,"b":"AAAAAAAAAAAAAAAAADAAAKgAAqoACqr8C7qwDI6ADI68DI6wC7qACqi8AMKwCqpQAvpQC/6iCf2qBfVoCaVg"},{"a":23808,"b":"AAAAAAAAAAAAAAAAAA/AA//wD//wD//wD//wD//wB/MwGfMwGXMwGZ/wBZwADZAACmqgCqqgAqqAAQFQBUAA"},{"a":23872,"b":"AAAAAAAAAAAAAAPAAD/wA//wD//wD//wD//wDf8wBnMwBnMwBnPwDf8ABnAABkAABmqgCaqgAqqABUBAAAFQ"},{"a":24384,"b":"AAAAAAAAAAAAAAAAA/IADzKQDzKQD/KQDzKQDzKQD/KAD/KAD/KAD/KQD96QD2aQD2aQD96QD2aAA2YAABAA"},{"a":32767,"b":"AA=="}],"capture":{"phase_cycles_uncertain":0,"frame_cycles":19656,"frame_ended_on_line":0,"picture_lines_low":0,"writes_account_for_end_state":true,"ram_bytes_changed_during_frame":73,"colour_cells_changed_during_frame":0}}/*END*/;
+(async function () {
+  if (!window.C64) { document.querySelectorAll('canvas').forEach(c => c.title = 'needs the built site (lib/c64.js)'); return; }
+  const G = await C64.load('listing.json'), ram = G.ram, PAL = C64.PAL;
+  const $ = id => document.getElementById(id);
+  const KIND = [
+    ['white wind-up robot', 'walks and climbs towards its player'],
+    ['grey spiky creature', 'walks; breathes a fireball along its row'],
+    ['green head on a spring', 'moves only by hopping'],
+    ['pale green flyer', 'flies diagonally, one pixel a step'],
+    ['purple whale shape', 'flies diagonally, two pixels a step'],
+    ['green cloak, red face', 'walks; throws a bottle that comes back'],
+    ['white robed figure', 'walks; rolls a slow boulder'],
+    ['white robot on legs', 'walks; drops a bolt straight down']];
+  const kindSprite = k => ram[0xAB6B + k], kindColour = k => ram[0xAB63 + k] & 15, kindFrames = k => [4, 4, 4, 4, 4, 2, 2, 2][k];
+  const sprite = n => ram.subarray(0x4000 + n * 64, 0x4000 + n * 64 + 63);
+  const drawEnemy = (ctx, k, f, x, y, s) => C64.drawSpriteMC(ctx, sprite(kindSprite(k) + f), x, y, s, PAL[kindColour(k)], PAL[2], PAL[1]);
+
+  // ---- 01 rounds
+  const sel = $('bb-round');
+  for (let i = 0; i < 100; i++) sel.add(new Option('Round ' + (i + 1), i));
+  const mapCtx = C64.canvas($('bb-map'), 512, 400);
+  function glyphs(lv) {                     // the character set as build_round leaves it, for the codes a layout uses
+    const cs = new Uint8Array(0x100);
+    cs.set(ram.subarray(0x4050, 0x4080), 0x50);                       // shadows $0A-$0F
+    cs.set(ram.subarray(0xC26E + 8 * lv, 0xC276 + 8 * lv), 0xA8);     // wall tile, $15
+    const p = ram[0xFF94 + lv] & 0x7F;
+    for (let i = 0; i < 4; i++)
+      cs.set(p < 0x64 ? ram.subarray(0xBB0E + 32 * p + 8 * i, 0xBB16 + 32 * p + 8 * i) : ram.subarray(0xC26E + 8 * lv, 0xC276 + 8 * lv), 0xB0 + 8 * i);
+    return cs;
+  }
+  let tick = 0;
+  function drawRound() {
+    const lv = +sel.value, s = 2, ctx = mapCtx;
+    const col = ram[0xFF30 + lv], cols = [null, PAL[col >> 4], PAL[col & 15], PAL[1]];
+    const S = BB.screen(ram, lv), cs = glyphs(lv), half = BB.half(ram, lv);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 512, 400);
+    for (let r = 0; r < 25; r++) for (let c = 0; c < 32; c++) if (S[r][c] !== 0x20) C64.drawGlyphMC(ctx, cs, S[r][c], c * 16, r * 16, s, cols);
+    if ($('bb-t-half').checked && half) { ctx.fillStyle = 'rgba(0,0,0,.72)'; ctx.fillRect(256, 16, 256, 368); }
+    if ($('bb-t-air').checked) {
+      const A = BB.air(ram, lv), W = BB.walls(ram, lv);
+      ctx.strokeStyle = 'rgba(120,220,255,.9)'; ctx.lineWidth = 1.5;
+      const d = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+      for (let r = 0; r < 25; r++) for (let c = 0; c < 32; c++) {
+        if (W[r][c]) continue;
+        const [dx, dy] = d[A[r][c]], x = c * 16 + 8, y = r * 16 + 8;
+        ctx.beginPath(); ctx.moveTo(x - dx * 5, y - dy * 5); ctx.lineTo(x + dx * 5, y + dy * 5);
+        ctx.lineTo(x + dx * 5 - dx * 3 - dy * 3, y + dy * 5 - dy * 3 - dx * 3);
+        ctx.moveTo(x + dx * 5, y + dy * 5); ctx.lineTo(x + dx * 5 - dx * 3 + dy * 3, y + dy * 5 - dy * 3 + dx * 3); ctx.stroke();
+      }
+    }
+    const It = BB.items(ram, lv);
+    if ($('bb-t-items').checked && lv < 99) {
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#fff'; ctx.strokeRect(It.points.col * 16 + 1, It.points.row * 16 + 1, 30, 30);
+      ctx.strokeStyle = PAL[7]; ctx.strokeRect(It.special.col * 16 + 1, It.special.row * 16 + 1, 30, 30);
+    }
+    const E = BB.enemies(ram, lv, $('bb-t-super').checked);
+    for (const e of E) {
+      const x = (e.x - 24) * 2 + 24, y = Math.max(10, (e.y - 50) * 2 + 21);
+      ctx.fillStyle = PAL[kindColour(e.kind)]; ctx.beginPath(); ctx.arc(x, y, 6, 0, 7); ctx.fill();
+      ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
+    }
+    const cast = $('bb-cast'); cast.innerHTML = '';
+    for (const e of E) {
+      const cv = document.createElement('canvas'), c2 = C64.canvas(cv, 48, 42);
+      drawEnemy(c2, e.kind, (e.left ? kindFrames(e.kind) : 0) + (tick % kindFrames(e.kind)), 0, 0, 2);
+      cv.title = KIND[e.kind][0]; cast.appendChild(cv);
+    }
+    const a = BB.layoutAddr(ram, lv), ar = BB.airRecord(ram, lv), al = ram[ar] & 0x80 ? 'same as round ' + ((ram[ar] & 0x7F) + 1) : ram[ar] + ' bytes';
+    const vents = !It.vents ? 'none' : ['water', 'fire', 'thunder'].filter(k => It[k]).join(', ') || 'plain bubbles only';
+    const t = lv === 55 ? 10 : lv >= 56 ? 20 : 30;
+    $('bb-info').innerHTML =
+      `<dt>layout</dt><dd><code>${C64.hex(a)}</code>, ${half ? '46 bytes, mirrored' : '92 bytes'}</dd>` +
+      `<dt>air currents</dt><dd><code>${C64.hex(ar)}</code>, ${al}</dd>` +
+      `<dt>enemies</dt><dd>${E.length ? E.length : 'none: the boss'}</dd>` +
+      `<dt>timer</dt><dd>${lv === 99 ? 'stopped' : t + ' seconds'}</dd>` +
+      `<dt>vents</dt><dd>${vents}</dd>` +
+      `<dt>wall block</dt><dd>${(ram[0xFF94 + lv] & 0x7F) < 0x64 ? 'number ' + (ram[0xFF94 + lv] & 0x7F) : 'the tile itself'}</dd>`;
+  }
+  sel.onchange = drawRound;
+  $('bb-prev').onclick = () => { sel.value = (+sel.value + 99) % 100; drawRound(); };
+  $('bb-next').onclick = () => { sel.value = (+sel.value + 1) % 100; drawRound(); };
+  for (const id of ['bb-t-air', 'bb-t-half', 'bb-t-items', 'bb-t-super']) $(id).onchange = drawRound;
+  drawRound();
+
+  // ---- 02 the merge
+  const PICS = [['plain bubble, small', 0, 5], ['plain bubble, medium', 4, 5], ['plain bubble, full', 8, 5], ['water bubble', 12, 3],
+                ['fire bubble', 16, 2], ['thunder bubble', 20, 5], ['letter E', 24, 5], ['letter X', 28, 5], ['letter T', 32, 5],
+                ['letter N', 36, 5], ['letter D', 40, 5], ['Baron', 48, 1]];
+  const pic = $('bb-pic');
+  PICS.forEach((p, i) => pic.add(new Option(p[0], i)));
+  pic.value = 2;
+  const stage = ['bb-s-bg', 'bb-s-mask', 'bb-s-gfx', 'bb-s-out'].map(id => C64.canvas($(id), 144, 96));
+  function drawMerge() {
+    const [, base, colour] = PICS[+pic.value], n = base + (+$('bb-shift').value);
+    $('bb-shift-v').textContent = $('bb-shift').value;
+    const g = ram[0xAA54 + n] | ram[0xAA8E + n] << 8, m = ram[0xAAC8 + n] | ram[0xAB02 + n] << 8;
+    const tile = ram.subarray(0xC26E, 0xC276), cols = ['#000', PAL[2], PAL[1], PAL[colour]];
+    // the six cells: an empty row over a row of wall tiles
+    const bg = (cx, y) => y < 8 ? 0 : tile[y - 8];
+    const put = (ctx, f) => {
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 144, 96);
+      for (let cx = 0; cx < 3; cx++) for (let y = 0; y < 16; y++) {
+        const v = f(cx, y);
+        for (let x = 0; x < 4; x++) { const p = (v >> (6 - 2 * x)) & 3; if (p) { ctx.fillStyle = cols[p]; ctx.fillRect(cx * 48 + x * 12, y * 6, 12, 6); } }
+      }
+      ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 1;
+      for (let i = 1; i < 3; i++) { ctx.beginPath(); ctx.moveTo(i * 48 + .5, 0); ctx.lineTo(i * 48 + .5, 96); ctx.stroke(); }
+      ctx.beginPath(); ctx.moveTo(0, 48.5); ctx.lineTo(144, 48.5); ctx.stroke();
+    };
+    put(stage[0], bg);
+    put(stage[1], (cx, y) => bg(cx, y) & ram[m + cx * 16 + y]);
+    put(stage[2], (cx, y) => ram[g + cx * 16 + y]);
+    put(stage[3], (cx, y) => (bg(cx, y) & ram[m + cx * 16 + y]) | ram[g + cx * 16 + y]);
+  }
+  pic.onchange = drawMerge; $('bb-shift').oninput = drawMerge; drawMerge();
+  if (BB_FRAME) C64.drawFrame($('bb-frame'), BB_FRAME, 2);
+
+  // ---- 03 the cast
+  const stats = Array.from({ length: 8 }, () => ({ n: 0, first: 0 }));
+  for (let lv = 0; lv < 100; lv++) for (const e of BB.enemies(ram, lv)) { stats[e.kind].n++; if (!stats[e.kind].first) stats[e.kind].first = lv + 1; }
+  const kt = $('bb-kinds');
+  kt.innerHTML = '<tr><th>Kind</th><th></th><th>Looks like</th><th>Moves</th><th>First round</th><th>In all</th></tr>';
+  const kc = [];
+  KIND.forEach((k, i) => {
+    const tr = kt.insertRow();
+    tr.innerHTML = `<td class="bb-num">${i}</td><td></td><td>${k[0]}</td><td>${k[1]}</td><td class="bb-num">${stats[i].first}</td><td class="bb-num">${stats[i].n}</td>`;
+    const cv = document.createElement('canvas'); kc.push(C64.canvas(cv, 72, 63)); tr.cells[1].appendChild(cv);
+  });
+  function drawKinds() { kc.forEach((ctx, i) => { ctx.clearRect(0, 0, 72, 63); drawEnemy(ctx, i, tick % kindFrames(i), 0, 0, 3); }); }
+  setInterval(() => { tick++; drawKinds(); }, 180); drawKinds();
+
+  // ---- 04 chains
+  const bcd = b => (b >> 4) * 10 + (b & 15);
+  const itemPic = (ctx, picture, colour, x, y, s) => {
+    const a = 0x9AE0 + 32 * picture, cols = [null, PAL[2], PAL[1], PAL[colour & 7]];
+    C64.drawGlyphMC(ctx, ram.subarray(a, a + 32), 0, x, y, s, cols); C64.drawGlyphMC(ctx, ram.subarray(a, a + 32), 1, x, y + 8 * s, s, cols);
+    C64.drawGlyphMC(ctx, ram.subarray(a, a + 32), 2, x + 8 * s, y, s, cols); C64.drawGlyphMC(ctx, ram.subarray(a, a + 32), 3, x + 8 * s, y + 8 * s, s, cols);
+  };
+  function drawChain() {
+    const n = +$('bb-chain').value; $('bb-chain-v').textContent = n;
+    const bonus = bcd(ram[0xAB52 + n]) * 1000; let total = bonus;
+    $('bb-chain-bonus').textContent = bonus.toLocaleString('en');
+    const box = $('bb-chain-foods'); box.innerHTML = '';
+    for (let r = 1; r <= n; r++) {
+      const item = ram[0xA790 + r], code = ram[0xA79A + r], pts = code === 0x50 ? 500 : bcd(code) * 1000; total += pts;
+      const d = document.createElement('div'), cv = document.createElement('canvas'), ctx = C64.canvas(cv, 48, 48);
+      itemPic(ctx, ram[0xA892 + item], ram[0xA8E4 + item], 0, 0, 3);
+      d.appendChild(cv); d.appendChild(document.createTextNode(pts.toLocaleString('en'))); box.appendChild(d);
+    }
+    $('bb-chain-total').textContent = total.toLocaleString('en');
+  }
+  $('bb-chain').oninput = drawChain; drawChain();
+
+  // ---- 06 special items
+  const FX = { 0x00: ['shoe', 'the player moves half as fast again'], 0x01: ['cane', 'a giant food at the end of the round'], 0x02: ['cane', 'a giant food at the end of the round'],
+    0x03: ['sweet', 'bubbles reload in 3 steps, not 8'], 0x04: ['sweet', 'bubbles travel further'], 0x05: ['sweet', 'bubbles fly at double speed'],
+    0x06: ['red cross', '19 fireballs in place of bubbles'], 0x07: ['yellow cross', 'a flash, then a falling block that kills what it passes'], 0x08: ['cyan cross', 'a flood that kills every enemy'],
+    0x09: ['lamp', 'all three bubble powers and all three rings'], 0x0A: ['lamp', 'all three bubble powers'], 0x0B: ['lamp', 'every enemy is beaten at once and falls as food'],
+    0x0C: ['ring', '10 points for every jump'], 0x0D: ['ring', '10 points for every step'], 0x0E: ['ring', '10 points for every bubble blown'],
+    0x0F: ['clock', 'enemies frozen and the timer stopped for a while'], 0x10: ['potion', 'a bonus room: 30 seconds, 500 points a food'], 0x11: ['potion', 'a bonus room'], 0x12: ['potion', 'a bonus room'],
+    0x13: ['', 'points only'], 0x14: ['umbrella', 'skip three rounds'], 0x15: ['cane', 'a giant food at the end of the round'], 0x16: ['umbrella', 'skip seven rounds'], 0x17: ['cane', 'a giant food at the end of the round'],
+    0x18: ['heart', 'enemies frozen, players invincible until the round ends'], 0x19: ['chest', 'a giant food at the end of the round'], 0x1A: ['chest', 'a giant food at the end of the round'], 0x1B: ['chest', 'a giant food at the end of the round'],
+    0x1C: ['lamp', 'points only'], 0x1D: ['crystal ball', 'every enemy is beaten at once and falls as food'], 0x1E: ['', 'points only'], 0x1F: ['', 'points only'],
+    0x20: ['door', 'the secret room'], 0x21: ['door', 'from round 50 to round 70'], 0x22: ['potion', 'round 100 only: arms the thunder bubbles'] };
+  const it = $('bb-items');
+  it.innerHTML = '<tr><th>No.</th><th></th><th>Picture</th><th>Effect</th><th>Points</th><th>Routine</th></tr>';
+  for (let i = 0; i < 35; i++) {
+    const code = ram[0xA965 + i], pts = i < 0x18 ? bcd(code) * 10 : bcd(code) * 1000, r = ram[0x2D65 + i] | ram[0x2D88 + i] << 8;
+    const tr = it.insertRow();
+    tr.innerHTML = `<td class="bb-num">${C64.hex(i, 2)}</td><td></td><td>${FX[i][0]}</td><td>${FX[i][1]}</td><td class="bb-num">${pts.toLocaleString('en')}</td><td><code>${C64.hex(r)}</code></td>`;
+    const cv = document.createElement('canvas'); itemPic(C64.canvas(cv, 32, 32), ram[0xA8C1 + i], ram[0xA913 + i], 0, 0, 2); tr.cells[1].appendChild(cv);
+  }
+})();
 </script>

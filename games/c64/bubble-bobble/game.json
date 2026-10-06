@@ -36,6 +36,9 @@
   "step_models": {
     "50-coverage": [
       "claude-fable-5-1"
+    ],
+    "60-verify": [
+      "claude-fable-5-1"
     ]
   },
   "kit_version": "0.0.93",
@@ -92,7 +95,146 @@
     ]
   },
   "io": [],
-  "regions": [],
+  "regions": [
+    [
+      "$4000",
+      "$445F",
+      "graphics",
+      "character set as loaded: digits, letters, shadows, the title's lettering"
+    ],
+    [
+      "$462D",
+      "$47FF",
+      "text",
+      "the title page's string and start-up tables"
+    ],
+    [
+      "$5800",
+      "$703F",
+      "graphics",
+      "sprites: the players and the eight enemy kinds"
+    ],
+    [
+      "$7040",
+      "$7304",
+      "sound",
+      "music patterns"
+    ],
+    [
+      "$7440",
+      "$7ABF",
+      "graphics",
+      "sprites: the floating bubble and the boss"
+    ],
+    [
+      "$8000",
+      "$8487",
+      "graphics",
+      "bubble pictures and masks"
+    ],
+    [
+      "$8980",
+      "$8AFF",
+      "graphics",
+      "pop pictures"
+    ],
+    [
+      "$8B00",
+      "$8DE1",
+      "sound",
+      "the title tune"
+    ],
+    [
+      "$8F06",
+      "$9ADF",
+      "graphics",
+      "object pictures: the Baron, special bubbles, letters, shots"
+    ],
+    [
+      "$9AE0",
+      "$A31F",
+      "graphics",
+      "58 item pictures and the falling block"
+    ],
+    [
+      "$A320",
+      "$A427",
+      "graphics",
+      "giant food sprites"
+    ],
+    [
+      "$A47E",
+      "$A59F",
+      "graphics",
+      "giant food sprites"
+    ],
+    [
+      "$AE51",
+      "$B568",
+      "levels",
+      "the enemy lists of 100 rounds"
+    ],
+    [
+      "$B569",
+      "$B694",
+      "levels",
+      "item places and vent flags of 100 rounds"
+    ],
+    [
+      "$B695",
+      "$BB0D",
+      "levels",
+      "air currents of 100 rounds"
+    ],
+    [
+      "$BB0E",
+      "$C58D",
+      "graphics",
+      "59 wall blocks and 100 wall tiles"
+    ],
+    [
+      "$C58E",
+      "$C5F1",
+      "levels",
+      "top and bottom row openings"
+    ],
+    [
+      "$C5F2",
+      "$DFFF",
+      "levels",
+      "the layouts of 100 rounds"
+    ],
+    [
+      "$F0EE",
+      "$F1AB",
+      "text",
+      "the score table's string"
+    ],
+    [
+      "$F25E",
+      "$F476",
+      "sound",
+      "arpeggios, instrument blocks, note frequencies"
+    ],
+    [
+      "$F922",
+      "$FE8E",
+      "sound",
+      "tunes, sound effects and instruments"
+    ],
+    [
+      "$FE8F",
+      "$FF2F",
+      "graphics",
+      "small digits"
+    ],
+    [
+      "$FF30",
+      "$FFF7",
+      "levels",
+      "wall colours and patterns of 100 rounds"
+    ]
+  ],
   "links": {
     "wiki": "https://www.c64-wiki.com/wiki/Bubble_Bobble",
     "manual": ""

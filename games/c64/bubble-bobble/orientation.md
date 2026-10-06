@@ -69,18 +69,18 @@ forever, so VICE's own `SoundDeviceName="dummy"` was set in
    Let's make a journey to the cave of monsters! Good luck!") runs for
    about five seconds, Bub floats down in a bubble into round 1, "ROUND
    1 READY !!" shows, and play starts about fifteen seconds after the
-   key. Stick right for 1.2 s, wait half a second, stop:
-   **`work/play-round1.vsf`**, round 1 in play, three Benzos walking, one
-   of the three lives already lost.
+   key. **`work/play-r1-start.vsf`** is the machine 725 frames after the
+   key went down (the key held for the first 25): round 1, Bub standing
+   at his starting place, the three enemies coming down the left side.
 
-The listing is built from `work/entry.vsf`, with `work/play-round1.vsf`
+The listing is built from `work/entry.vsf`, with `work/play-r1-start.vsf`
 as the second image (`listing.py ... --entry`): the start-up code at
 `$4080`-`$409F` and `$4460`-`$4625` exists only at the hand-over, since
 the game then builds its level character set over it.
 
 ## Steady state
 
-Read from `play-round1.vsf` and from one frame recorded with
+Read from the play snapshot and from one frame recorded with
 `kit/c64/frame.py capture` in play (its rebuild matched the emulator's
 picture in all 104,448 pixels).
 
@@ -92,13 +92,14 @@ picture in all 104,448 pixels).
   other's address into `$FFFE`: `$072E` runs near the top of the picture
   (it sets `$D018` at line 51 and hands over at line 52), `$06AB` near
   the bottom (it writes sprite registers at lines 256-261 and hands back
-  at line 271). CIA 1's timer A interrupt is enabled as well
-  (`$DC0D` mask 1).
+  at line 271). `start` clears CIA 1's interrupt mask, so nothing else
+  interrupts.
 - **Video**: VIC bank 1 (`$DD00` low bits `%10`), `$D018` = `$41`: screen
   at `$5000`, characters at `$4000`, multicolour character mode
   (`$D016` = `$D8`), sprite pointers at `$53F8`.
-- **Main loop**: during play the program counter was sampled at `$0A5C`
-  inside a routine called from `$F0E8` (`JSR $08E4`).
+- **Main loop**: `pass_loop` at `$0A07`, inside `play_game` (`$08E4`),
+  which the title loop calls from `$F0E8`; the actors' logic runs from
+  the top raster handler.
 - **Where things are**: the unpacked game fills `$0400`-`$FFFF` almost
   completely; the hand-over image has six runs of zeros of 240 bytes or
   more (`$4210`, `$4C00`, `$55BF`, `$7C40`, `$8480`, `$8DE2`), 4 KB

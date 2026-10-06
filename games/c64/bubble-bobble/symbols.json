@@ -2,7 +2,7 @@
  "schema": 1,
  "platform": "c64",
  "game": "bubble-bobble",
- "build": "",
+ "build": "Remember's crack of the disk version (\"cracked in August 2002\", +12 trainers, all left off), the one file BUBBLE BOBBLE+ of a T64 archive; the game starts at $4460",
  "source": "regenerator2000 live",
  "regions": {
   "exclude": [
@@ -7661,13 +7661,13 @@
   },
   {
    "address": 16568,
-   "name": "wall_block_bl",
+   "name": "wall_block_tr",
    "type": "Field",
    "kind": "user"
   },
   {
    "address": 16576,
-   "name": "wall_block_tr",
+   "name": "wall_block_bl",
    "type": "Field",
    "kind": "user"
   },
@@ -7997,13 +7997,13 @@
   },
   {
    "address": 18616,
-   "name": "charset2_block_bl",
+   "name": "charset2_block_tr",
    "type": "Field",
    "kind": "user"
   },
   {
    "address": 18624,
-   "name": "charset2_block_tr",
+   "name": "charset2_block_bl",
    "type": "Field",
    "kind": "user"
   },
@@ -14678,7 +14678,7 @@
   {
    "address": 171,
    "type": "line",
-   "text": "Continues left: 7 for one player and 8 for two at the start (the panel shows one more), counted down each time a dead player rejoins."
+   "text": "Continues left: 8 in a one-player game and 7 with two players at the start (the panel shows one more), counted down each time a dead player rejoins."
   },
   {
    "address": 172,
@@ -14823,17 +14823,17 @@
   {
    "address": 256,
    "type": "line",
-   "text": "Bottom of the stack page, used as the frame counter of wait_frames; hurry_up saves the page's first 256 bytes of arrays elsewhere while it borrows code space."
+   "text": "Bottom of the stack page, used as the frame counter of wait_frames. Also the as-loaded operand of a load in hurry_up whose high byte is patched before it runs."
   },
   {
    "address": 263,
    "type": "line",
-   "text": "Base of the 32-byte work area ($0108-$0127) where build_letter_bubbles keeps the letter pictures; indexed from 1."
+   "text": "Base of the 32-byte work area ($0108-$0127) where build_letter_bubbles keeps the background glyphs; indexed from 1."
   },
   {
    "address": 264,
    "type": "line",
-   "text": "Thirty-two bytes of letter pictures copied from $4088 while the letter bubbles are built."
+   "text": "Thirty-two bytes of background glyphs (characters $11-$14) copied from $4088 while the letter blocks are built."
   },
   {
    "address": 271,
@@ -15033,7 +15033,7 @@
   {
    "address": 1961,
    "type": "line",
-   "text": "Still irq_boss_lower. The label is the base address of an indexed store in the round-banner code and has no meaning here."
+   "text": "Still irq_boss_lower. The label is here only because the bytes of a BIT skip at $7FA6 read as this address."
   },
   {
    "address": 2017,
@@ -15048,7 +15048,7 @@
   {
    "address": 2276,
    "type": "line",
-   "text": "One whole game. Shows the story text over the stars with the players floating down in their bubbles, sets up scores, lives (three), credits (seven, or eight with two players) and power-ups, then for each round: builds it, scrolls it in, drops the enemies in, and runs the pass loop at $0A07 until both players are out or the round is done; counts the round up, and after round 100 goes to the ending."
+   "text": "One whole game. Shows the story text over the stars with the players floating down in their bubbles, sets up scores, lives (three), credits (eight, or seven with two players) and power-ups, then for each round: builds it, scrolls it in, drops the enemies in, and runs the pass loop at $0A07 until both players are out or the round is done; counts the round up, and after round 100 goes to the ending."
   },
   {
    "address": 2567,
@@ -15128,7 +15128,7 @@
   {
    "address": 3314,
    "type": "line",
-   "text": "For each object below type $24 (a bubble): if it is still being blown, step it; else if a live player is within 16 pixels, mark it burst (type $34) with the player and its old type remembered; else let it drift: usually by the air current in the collision map cell under it (0 up, 1 right, 2 down, 3 left), sometimes away from a bubble it overlaps or back from the playfield's edge. A bubble that leaves the top or bottom wraps to the other side. Types $24-$32 go through special_object_table, $44 to the fire shot and $4C to the falling food."
+   "text": "For each object below type $24 (a bubble): if it is still being blown, step it; else if a live player is within 16 pixels, mark it burst (type $34) with the player and its old type remembered; else let it drift: usually by the air current in the collision map cell under it (0 up, 1 right, 2 down, 3 left); when it overlaps another bubble, more often than not a step along an axis chosen at random, kept inside the playfield near its edges. A bubble holding an enemy that leaves the top or the bottom wraps to the other side; any other bubble that does so is ended. Types $24-$32 go through special_object_table, $44 to the fireball and $4C to the falling food."
   },
   {
    "address": 3402,
@@ -15178,7 +15178,7 @@
   {
    "address": 3781,
    "type": "line",
-   "text": "Object type $4C, food left when a round is cleared with a giant item pending: falls a row at a time until it lands on a platform or leaves the bottom; a player within 16 pixels takes it for the score code $70."
+   "text": "Object type $4C, food that leftover bubbles turn into when a food round is cleared: falls a row at a time until it lands on a platform or leaves the bottom; a player within 16 pixels takes it for 700 points."
   },
   {
    "address": 3912,
@@ -15233,7 +15233,7 @@
   {
    "address": 4608,
    "type": "line",
-   "text": "Still fire_drop: the part that measures how far the fire run spreads each way. The label exists because an indexed store elsewhere uses this address as its base."
+   "text": "Still fire_drop: the part that measures how far the fire run spreads each way. The label is here only because a store in hurry_up carries $1200 as its as-loaded operand; its high byte is patched before it runs."
   },
   {
    "address": 4700,
@@ -15323,7 +15323,7 @@
   {
    "address": 5860,
    "type": "line",
-   "text": "Mark every enemy that is in an ordinary state angry: $FF in its fast flag, so its handler runs twice on alternate frames. The value at $16EF is patched to 0 and back by check_deaths to calm them instead."
+   "text": "Mark every enemy that is in an ordinary state angry: $FF in its fast flag, so its handler gets a second call on every second run of the actor loop. The value at $16EF is patched to 0 and back by check_deaths to calm them instead."
   },
   {
    "address": 5871,
@@ -15743,7 +15743,7 @@
   {
    "address": 11447,
    "type": "line",
-   "text": "Flash special item $18, then for each live player and each item on show: within 16 pixels takes it. The points item scores from points_item_scores; the special item scores from special_item_scores and runs its effect through the table at $2D65/$2D88. Scores below a table-dependent limit count in thousands, the others in hundreds or tens of thousands (one digit position higher). On round 100 the points item also recharges the weapon."
+   "text": "Flash special item $18, then for each live player and each item on show: within 16 pixels takes it. The points item scores from points_item_scores; the special item scores from special_item_scores and runs its effect through the table at $2D65/$2D88. Low-numbered items add their code to the low score byte (tens), the rest to the middle byte (thousands). On round 100 the points item also recharges the weapon."
   },
   {
    "address": 11601,
@@ -15778,27 +15778,27 @@
   {
    "address": 11691,
    "type": "line",
-   "text": "Special item 3: the player's reload time drops from 8 to 3 calls between bubbles."
+   "text": "Special item 3, a sweet: the player's reload time drops from 8 to 3 calls between bubbles."
   },
   {
    "address": 11698,
    "type": "line",
-   "text": "Special item 4: the player's bubbles travel $8C steps instead of $88 and the range flag becomes $FF."
+   "text": "Special item 4, a sweet: the player's bubbles travel $8C steps instead of $88 and the range flag becomes $FF."
   },
   {
    "address": 11710,
    "type": "line",
-   "text": "Special item 9: the three scoring bonuses and all three bubble powers at once."
+   "text": "Special item 9, the red lamp: the three scoring bonuses and all three bubble powers at once."
   },
   {
    "address": 11719,
    "type": "line",
-   "text": "Special item 10: fast reload, long range and fast bubbles."
+   "text": "Special item 10, the yellow lamp: fast reload, long range and fast bubbles."
   },
   {
    "address": 11725,
    "type": "line",
-   "text": "Special item 5: sets the player's bubble speed flag to $FF, so each blown bubble moves two steps a pass."
+   "text": "Special item 5, a sweet: sets the player's bubble speed flag to $FF, so each blown bubble moves two steps a pass."
   },
   {
    "address": 11730,
@@ -15808,7 +15808,7 @@
   {
    "address": 11735,
    "type": "line",
-   "text": "Special item 8: stop the actors, end every object, then sweep the 28 playfield columns from the bottom row up, two frames a row, turning every background cell into character $FF in grey; players being carried by water return to normal and every enemy is killed."
+   "text": "Special item 8, the blue cross: stop the actors, end every object, then sweep the 28 playfield columns from the bottom row up, two frames a row, turning every background cell into character $FF in grey, a flood; players being carried by water return to normal and every enemy is killed."
   },
   {
    "address": 11873,
@@ -15828,7 +15828,7 @@
   {
    "address": 11980,
    "type": "line",
-   "text": "Special item $0B: load a sprite picture from bonus_sprite_a into the item buffers, clear the playfield, save the six enemies at $4700 and turn all six sprites into state $13 with shape $F4, flashing the screen red and black; they gather at X $88, Y $91."
+   "text": "Special item $0B, the purple lamp: load a sprite picture from bonus_sprite_a into the item buffers, end every object and kill every enemy, then save the six enemy slots at $4700 and turn all six sprites into state $13 with shape $F4, flashing the screen red and black; they gather at X $88, Y $91, and when the show is over the enemies come back as they were saved, already beaten, and fall as food."
   },
   {
    "address": 12010,
@@ -15838,42 +15838,42 @@
   {
    "address": 12127,
    "type": "line",
-   "text": "Special item $0C: turns on the bonus for jumping."
+   "text": "Special item $0C, a ring: turns on the bonus for jumping."
   },
   {
    "address": 12130,
    "type": "line",
-   "text": "Special item $0D: turns on the bonus for walking."
+   "text": "Special item $0D, a ring: turns on the bonus for walking."
   },
   {
    "address": 12133,
    "type": "line",
-   "text": "Special item $0E: turns on the bonus for blowing bubbles."
+   "text": "Special item $0E, a ring: turns on the bonus for blowing bubbles."
   },
   {
    "address": 12136,
    "type": "line",
-   "text": "Special item $0F: invert the playfield colours and freeze the enemies for $87 passes; the round timer stops."
+   "text": "Special item $0F, the clock: invert the playfield colours and freeze the enemies for $87 passes; the round timer stops."
   },
   {
    "address": 12157,
    "type": "line",
-   "text": "Special item $10: a bonus room of food drawn in colour $0D, with picture pair $C0."
+   "text": "Special item $10, a potion: a bonus room of food drawn in colour $0D, with picture pair $C0."
   },
   {
    "address": 12163,
    "type": "line",
-   "text": "Special item $11: a bonus room in colour $0C with picture pair $00."
+   "text": "Special item $11, a potion: a bonus room in colour $0C with picture pair $00."
   },
   {
    "address": 12169,
    "type": "line",
-   "text": "Special item $12: a bonus room in colour $0F with picture pair $E0."
+   "text": "Special item $12, a potion: a bonus room in colour $0F with picture pair $E0."
   },
   {
    "address": 12173,
    "type": "line",
-   "text": "Clear the playfield of enemies and objects, then fill it with 2 by 2 food blocks (characters $42-$45): every second row and column where four free cells exist, on a row pattern that depends on the round, up to 85 of them, each remembered with its sprite position and screen address. Thirty seconds on the timer; the players collect them (bonus_collect) for the score in $3200; then the scene is cleared and a results panel shows each player's count and awards the one with more 100,000 points, the other 5,000."
+   "text": "Clear the playfield of enemies and objects, then fill it with 2 by 2 food blocks (characters $42-$45): every second row and column where four free cells exist, on a row pattern that depends on the round, up to 85 of them, each remembered with its sprite position and screen address. Thirty seconds on the timer; the players collect them (bonus_collect) for 500 points each; then the scene is cleared and a results panel shows each player's count. Only if every block was taken is there an award: 100,000 points to a player who took at least as many as the other, 50,000 to one who took fewer."
   },
   {
    "address": 12448,
@@ -15928,7 +15928,7 @@
   {
    "address": 12800,
    "type": "line",
-   "text": "Operand: score code for one block of the current bonus scene ($50 in the bonus rooms, $12 in the secret room)."
+   "text": "Operand: score code for one block of the current bonus scene: $50 in the bonus rooms (500 points, in the low score byte) and $12 in the secret room (12,000, in the middle byte; codes below $32 go one byte up)."
   },
   {
    "address": 12852,
@@ -15968,32 +15968,32 @@
   {
    "address": 13450,
    "type": "line",
-   "text": "Special items 1 and $15: choose giant food 0 for the end of the round (item $1B, score code $10 or $20)."
+   "text": "Special items 1 and $15, canes: choose giant food 0 for the end of the round (item $1B, score code $10 or $20)."
   },
   {
    "address": 13461,
    "type": "line",
-   "text": "Special items 2 and $17: choose giant food 1 (item $18, score code $20 or $30)."
+   "text": "Special items 2 and $17, canes: choose giant food 1 (item $18, score code $20 or $30)."
   },
   {
    "address": 13472,
    "type": "line",
-   "text": "Special item $18: every enemy in an ordinary state becomes frozen (state $16) and every live player invincible (state $18); tune $19 plays, and when it ends the players return to state 1 and released enemies to $16."
+   "text": "Special item $18, the heart: every enemy in an ordinary state becomes frozen (state $16) and every live player invincible (state $18); tune $19 plays, and when the round ends the players return to state 1."
   },
   {
    "address": 13562,
    "type": "line",
-   "text": "Special item $19: choose giant food 2 (item $29, score code $30)."
+   "text": "Special item $19, a chest: choose giant food 2 (item $29, score code $30)."
   },
   {
    "address": 13570,
    "type": "line",
-   "text": "Special item $1A: choose giant food 3 (item $2B, score code $40)."
+   "text": "Special item $1A, a chest: choose giant food 3 (item $2B, score code $40)."
   },
   {
    "address": 13578,
    "type": "line",
-   "text": "Special item $1B: choose giant food 4 (item $2C, score code $50)."
+   "text": "Special item $1B, a chest: choose giant food 4 (item $2C, score code $50)."
   },
   {
    "address": 13584,
@@ -16013,7 +16013,7 @@
   {
    "address": 13744,
    "type": "line",
-   "text": "Special item $1D: build a symmetrical picture in the item buffers from bonus_sprite_b, clear the playfield and turn the six enemy sprites into state $14, the flashing formation."
+   "text": "Special item $1D, the crystal ball: build a symmetrical picture in the item buffers from bonus_sprite_b, end every object and kill every enemy, and show the six sprites as state $14, the flashing formation; afterwards the beaten enemies come back and fall as food."
   },
   {
    "address": 13857,
@@ -16053,12 +16053,12 @@
   {
    "address": 15032,
    "type": "line",
-   "text": "The \"HURRY UP\" banner: make the enemies angry, then scroll a nine-character banner up the middle of the playfield a row at a time, merging its glyphs with the background, flash it six times with tune $3C at row 12, carry it to the top, restore everything, and restart the round tune."
+   "text": "The \"HURRY UP\" banner: make the enemies angry, then scroll a nine-character banner up the middle of the playfield a row at a time, merging its glyphs with the background, flash it six times with tune $3C at row 12, carry it to the top, restore everything, and restart the round tune. For work space it borrows 256 bytes of draw-handler code at $3CB2: the code is parked in the first page of the back screen and put back at the end, when that screen page is restored from the clean copy."
   },
   {
    "address": 15088,
    "type": "line",
-   "text": "Operand patched with the back screen's high byte; from here hurry_up saves page 1 and the screen rows it scrolls through."
+   "text": "Operand high byte, patched with the back screen's page: the store that parks the borrowed code in that screen page. From here hurry_up saves the screen rows it scrolls through."
   },
   {
    "address": 15265,
@@ -16068,12 +16068,12 @@
   {
    "address": 15345,
    "type": "line",
-   "text": "Operand patched with the back screen's high byte for the restore of the stack-page arrays."
+   "text": "Operand high byte, patched with the back screen's page: the load that brings the parked code back."
   },
   {
    "address": 15354,
    "type": "line",
-   "text": "Operand patched with the back screen's high byte for the restore of the clean screen copy."
+   "text": "Operand high byte, patched with the back screen's page: the store that restores that screen page from the clean copy."
   },
   {
    "address": 15361,
@@ -16088,7 +16088,7 @@
   {
    "address": 15547,
    "type": "line",
-   "text": "Nine bytes inside draw_carrier's code that hurry_up borrows to hold the banner row's colours; the code is restored from the copy made at $1200 when the banner ends."
+   "text": "Nine bytes inside draw_carrier's code that hurry_up borrows to hold the banner row's colours; the code is put back from its parked copy in the screen when the banner ends."
   },
   {
    "address": 15556,
@@ -16163,7 +16163,7 @@
   {
    "address": 16125,
    "type": "line",
-   "text": "Draw handler for types $28 and $44, an enemy's shot and the player's fireball: one of four pictures by its animation phase."
+   "text": "Draw handler for types $28 and $44, an enemy's fireball and the player's: the picture is chosen by the object's sub-column, which holds its direction (0 or 2) plus a phase bit toggled each pass, so two pictures for each direction alternate."
   },
   {
    "address": 16168,
@@ -16223,17 +16223,17 @@
   {
    "address": 16512,
    "type": "line",
-   "text": "Two bytes of the seven-byte block the title copies to $F043: see title_patch."
+   "text": "Seven bytes that title_patch copies over $F043-$F049: STX level / LDA #3 / STA $D015, the instructions every later visit to the score table runs there."
   },
   {
    "address": 16513,
    "type": "line",
-   "text": "Second byte of the block copied to $F043: the operand that sets the round before the first."
+   "text": "Second of those seven bytes: the zero-page operand of the STX, level."
   },
   {
    "address": 16514,
    "type": "line",
-   "text": "Enable the two player sprites and copy seven bytes from $4080 over $F043-$F049, the instructions that set the starting round, then jump on to the title loop. Run once per visit to the score table from memory that level graphics later overwrite."
+   "text": "The first visit to the score table only: enable the two player sprites, replace the seven bytes at $F043 (which set the round and jump here) with the copy at $4080, and go on to the title loop. Later visits run the replacement in place; by then this code has been overwritten by level graphics."
   },
   {
    "address": 16519,
@@ -16273,12 +16273,12 @@
   {
    "address": 16568,
    "type": "line",
-   "text": "Character $17, bottom left of the wall block."
+   "text": "Character $17, top right of the wall block."
   },
   {
    "address": 16576,
    "type": "line",
-   "text": "Character $18, top right of the wall block."
+   "text": "Character $18, bottom left of the wall block."
   },
   {
    "address": 16584,
@@ -16798,7 +16798,7 @@
   {
    "address": 23296,
    "type": "line",
-   "text": "Sprites $6C-$72: the player's death, four frames spinning (frames $0B-$0E overlap the last blowing frame) and four of the body rising with a halo (frames $0F-$12)."
+   "text": "Sprites $6C-$72: the player's death. Sprites $6C-$6E with the last blowing frame are the four spinning frames ($0B-$0E); sprites $6F-$72 are four frames of the dragon with a ring turning over its head (frames $0F-$12), which loop until the death sequence ends."
   },
   {
    "address": 23359,
@@ -16823,7 +16823,7 @@
   {
    "address": 23552,
    "type": "line",
-   "text": "Sprites $70-$72: the last three frames of the player's death, the body rising with a halo."
+   "text": "Sprites $70-$72: three of the four looping frames of the dragon with a ring over its head."
   },
   {
    "address": 23615,
@@ -17253,7 +17253,7 @@
   {
    "address": 32753,
    "type": "line",
-   "text": "Special item 0, the shoe: set the player's fast flag ($FE), so the player's handler runs twice on alternate frames."
+   "text": "Special item 0, the shoe: set the player's fast flag ($FE), so the player's handler gets a second call on every second run of the actor loop: three runs in four frames instead of two."
   },
   {
    "address": 32759,
@@ -17418,7 +17418,7 @@
   {
    "address": 34360,
    "type": "line",
-   "text": "Per actor: frames to wait before its handler runs (an enemy's start delay from its record)."
+   "text": "Per actor: runs of the actor loop (one every second frame) to wait before its handler is called; for an enemy its start delay from its record, during which it still animates."
   },
   {
    "address": 34361,
@@ -17468,7 +17468,7 @@
   {
    "address": 34600,
    "type": "line",
-   "text": "Per actor: non-zero makes its handler run twice on alternate frames. Set for a player by the shoe ($FE) and for angry enemies ($FF)."
+   "text": "Per actor: non-zero gives its handler a second call on every second run of the actor loop, which makes the actor half as fast again. Set for a player by the shoe ($FE) and for angry enemies ($FF)."
   },
   {
    "address": 34601,
@@ -17818,7 +17818,7 @@
   {
    "address": 42423,
    "type": "line",
-   "text": "Round 100 is won: add 10 a hundred times at the fourth digit of the winner's score, a frame apart (1,000,000 points in all), show the stars and the congratulation text with tune $51, switch on six sprites drawn by place_boss, which walks them to and fro, and wait for fire to be pressed and released."
+   "text": "Round 100 is won: add 10 a hundred times at the fourth digit of the winner's score, a frame apart (1,000,000 points in all), show the stars and the congratulation text with tune $51, and switch on six sprites that place_boss draws with the boss's own top two rows and walks to and fro; then wait for fire to be pressed and released."
   },
   {
    "address": 42424,
@@ -17863,12 +17863,12 @@
   {
    "address": 42573,
    "type": "line",
-   "text": "Special item 6: give the player $13 (19) fireballs: fire then breathes a fireball that flies straight and kills enemies, instead of blowing a bubble."
+   "text": "Special item 6, the red cross: give the player $13 (19) fireballs: fire then breathes a fireball that flies straight and kills enemies, instead of blowing a bubble."
   },
   {
    "address": 42579,
    "type": "line",
-   "text": "Special item 7: schedule the screen flash and the giant falling block 2-5 passes from now."
+   "text": "Special item 7, the yellow cross: schedule the screen flash and the giant falling block 2-5 passes from now."
   },
   {
    "address": 42592,
@@ -18158,12 +18158,12 @@
   {
    "address": 43046,
    "type": "line",
-   "text": "Low bytes of the four fireball pictures, by animation phase."
+   "text": "Low bytes of the four fireball pictures: two for each direction."
   },
   {
    "address": 43050,
    "type": "line",
-   "text": "Low bytes of the four fireball masks."
+   "text": "Low bytes of the four fireball masks, in the same order."
   },
   {
    "address": 43054,
@@ -18213,12 +18213,12 @@
   {
    "address": 43318,
    "type": "line",
-   "text": "Score code of each points item. Items 0-14 count in hundreds (100, 400, 500 ... 8,500); from item 15 in thousands (1,000 up to 12,000)."
+   "text": "Score code of each points item. Items 0-14 are added to the low score byte, which counts tens: 10, 40, 50, 50, 70, 70, 200, 350, 500, 500, 500, 700, 700, 750 and 850 points. From item 15 the code goes to the middle byte, which counts thousands: 1,000 up to 12,000."
   },
   {
    "address": 43365,
    "type": "line",
-   "text": "Score code of each special item: items 0-$17 count in hundreds ($10 is 1,000 points, $50 is 5,000), items from $18 in thousands."
+   "text": "Score code of each special item: for items below $18 it is added to the low score byte (tens), so $10 is 100 points, $20 is 200, $50 is 500 and $01 is 10; from item $18 it goes to the middle byte and counts thousands."
   },
   {
    "address": 43400,
@@ -18613,7 +18613,7 @@
   {
    "address": 46741,
    "type": "line",
-   "text": "The air currents of all 100 rounds, a record per round. The first byte is the record's length; a first byte with bit 7 set is a one-byte record meaning \"use round n's currents\". The second byte is unused by the reader; then come entries of three bytes each, a rectangle of one direction: byte 0 bit 7 set, bits 5-6 the direction (0 up, 1 right, 2 down, 3 left), bits 0-4 the column; byte 1 bits 3-7 the row, bits 0-2 the top of the width; byte 2 bits 6-7 the rest of the width, bits 0-4 the height. A byte without bit 7 in an entry's place mirrors the left half of the map onto the right, swapping left and right currents."
+   "text": "The air currents of all 100 rounds, a record per round. The first byte is the record's length, or zero for none; a first byte with bit 7 set is a one-byte record meaning \"use round n's currents\" (rounds 2, 36 and 48 use round 1's, round 52 round 50's). Entries follow from the second byte. A rectangle is three bytes: byte 0 has bit 7 set, the direction in bits 5-6 (0 up, 1 right, 2 down, 3 left) and the column in bits 0-4; byte 1 has the row in bits 3-7 and the top three bits of the width; byte 2 the last two bits of the width in bits 6-7 and the height in bits 0-4, width and height both stored less one. A single byte without bit 7 in an entry's place mirrors the left half of the map onto the right, swapping left and right currents."
   },
   {
    "address": 47154,
@@ -18638,7 +18638,7 @@
   {
    "address": 47886,
    "type": "line",
-   "text": "The 59 wall blocks, 32 bytes each: four multicolour glyphs (top left, bottom left, top right, bottom right) that tile the two side walls of a round. level_pattern picks one per round."
+   "text": "The 59 wall blocks, 32 bytes each: four multicolour glyphs (top left, top right, bottom left, bottom right) that tile the two side walls of a round. level_pattern picks one per round."
   },
   {
    "address": 48398,
@@ -18673,7 +18673,7 @@
   {
    "address": 50574,
    "type": "line",
-   "text": "Per round: four two-bit codes for the openings in the top row (bits 0-1 left half, 2-3 right half) and the bottom row (bits 4-5, 6-7): 0 or 3 closed, 1 or 2 an opening near the middle. Players and bubbles pass through an opening from the bottom of the screen to the top."
+   "text": "Per round: bit 0 opens the top row at columns 9-12 and bit 1 at columns 19-22; bits 2 and 3 do the same for the bottom row. Bits 4-5 are the air current of the top row and bits 6-7 of the bottom row. Players, enemies and bubbles pass through an opening from one edge of the screen to the other."
   },
   {
    "address": 50674,
@@ -18793,7 +18793,7 @@
   {
    "address": 57856,
    "type": "line",
-   "text": "Still build_air_currents: decoding one rectangle. The label is only the base of an indexed store elsewhere."
+   "text": "Still build_air_currents: decoding one rectangle. The label is here only because a store in hurry_up carries $E200 as its as-loaded operand; its high byte is patched before it runs."
   },
   {
    "address": 57996,
@@ -18803,7 +18803,7 @@
   {
    "address": 58009,
    "type": "line",
-   "text": "Unpack round X's layout into $8B00 with the I/O switched out ($01 = $30), because the layouts lie in $C5F2-$DFFF, partly under the chips. Each earlier round takes 46 bytes if bit 7 of its byte in level_pattern is set and 92 if not. The round's byte in level_gaps gives the two-bit openings at the left and right of the top and bottom rows. A full layout is 23 rows of four bytes copied as they are; a half layout holds two bytes a row, and the other two are their mirror image. The fourth byte of each row has its top two bits forced on (the right wall)."
+   "text": "Unpack round X's layout into $8B00 with the I/O switched out ($01 = $30), because the layouts lie in $C5F2-$DFFF, partly under the chips. Each earlier round takes 46 bytes if bit 7 of its byte in level_pattern is set and 92 if not. The round's byte in level_gaps gives the openings of the top and bottom rows and their air currents. A full layout is 23 rows of four bytes copied as they are; a half layout holds two bytes a row, and the other two are their mirror image. After each row the top two bits of the next row's first byte are forced on: the left wall."
   },
   {
    "address": 58051,
@@ -19013,7 +19013,7 @@
   {
    "address": 58968,
    "type": "line",
-   "text": "Make the glyphs of the six EXTEND letter bubbles and the letter blocks: copy the letter pictures at $4088 up, then for each of five pictures combine 32 bytes at $4250 onward with the bubble mask and outline for that stage and the pattern in extend_mask; finally copy characters $40-$5F to the second character set."
+   "text": "Make the glyphs of the five letter bubbles as 2 by 2 blocks for the panel and the EXTEND scene: copy the background (characters $11-$14, the wall-block copy, 32 bytes from $4088) to $0108, then for each of the letters E, X, T, N and D build 32 bytes at $4250 onward as the background masked by the bubble mask, ORed with that letter bubble's picture, and ANDed with extend_mask; finally copy characters $40-$5F to the second character set."
   },
   {
    "address": 59085,
@@ -19068,7 +19068,7 @@
   {
    "address": 59343,
    "type": "line",
-   "text": "The bubble renderer. An object covers three cells across and up to three down. For each row of three cells it finds the glyphs now on screen there, replaces the three cells with fresh dynamic characters (numbered from next_glyph), and writes each new glyph as the old glyph ANDed with the picture's mask and ORed with its graphic, for the 16 rows of the picture, with the rows above and below the picture copied unchanged. The picture's vertical offset (rows_left) decides where it starts in the first row of cells."
+   "text": "The bubble renderer. An object covers three cells across and two or three rows of cells. Starting in the lowest row of cells and working upward line by line, it finds the glyphs now on screen there, replaces the three cells with fresh dynamic characters (numbered from next_glyph), and writes each new glyph as the old glyph ANDed with the picture's mask and ORed with its graphic, for the 16 lines of the picture; the lines of the cells below and above the picture are copied unchanged. The object's sub-row (rows_left) decides how many lines are copied before the picture's bottom line."
   },
   {
    "address": 59465,
@@ -19133,7 +19133,7 @@
   {
    "address": 59530,
    "type": "line",
-   "text": "Move the renderer down to the next row of cells: find the three glyphs under it, hand out three more dynamic characters and continue the merge."
+   "text": "Move the renderer up to the row of cells above: find the three glyphs on screen there, hand out three more dynamic characters and continue the merge. A picture is merged from its bottom line upward."
   },
   {
    "address": 59662,
@@ -19228,7 +19228,7 @@
   {
    "address": 60356,
    "type": "line",
-   "text": "Start an enemy's jump: 31 steps, straight up, with its turn bit cleared."
+   "text": "Start an enemy's jump: 31 steps, straight up, with the jump-request bit (bit 2) of its control byte cleared."
   },
   {
    "address": 60377,
@@ -19348,7 +19348,7 @@
   {
    "address": 61507,
    "type": "line",
-   "text": "LDA #$FF / STA level / JMP title_patch: sets the round before the first to $FF. The seven bytes are rewritten from $4080 each time, and the cracker's menu stores its starting round minus two in the operand at $F044."
+   "text": "As loaded: LDA #$FF / STA level / JMP title_patch, which sets the round before the first. title_patch replaces these seven bytes with STX level / LDA #3 / STA $D015 on the first visit. The cracker's menu stores its starting round minus two in the operand at $F044, so its choice applies to the first game only."
   },
   {
    "address": 61514,
@@ -19523,7 +19523,7 @@
   {
    "address": 62219,
    "type": "line",
-   "text": "Sixteen bytes of the filter sweep, loaded by music command $9A: rates and durations, the starting cutoff and resonance."
+   "text": "Sixteen bytes of the filter sweep, loaded by music command $9A: rates and durations and the starting cutoff."
   },
   {
    "address": 62235,
@@ -19733,7 +19733,7 @@
   {
    "address": 62351,
    "type": "line",
-   "text": "Filter sweep settings: flags, then the resonance byte."
+   "text": "Filter sweep settings: a flag byte copied with the block but not read by the sweep; the byte after it is not read by anything found."
   },
   {
    "address": 62353,
