@@ -185,7 +185,7 @@ input[type=range]{width:220px;vertical-align:middle}
   <p class="lede">The round timer counts real seconds, one for every 50 frames.</p>
   <div class="bb-two">
     <div class="plate"><img class="bb-shot" src="reference/hurry-up.png" alt="Round 1 with the HURRY UP banner"><p class="cap">The banner, 30 seconds into round 1.</p></div>
-    <div class="plate"><img class="bb-shot" src="reference/baron.png" alt="Round 1 with a Baron"><p class="cap">Ten seconds later a Baron arrives for each player.</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/baron.png" alt="Round 1 with a Baron"><p class="cap">Ten seconds later a Baron arrives for each player, here at the top left.</p></div>
   </div>
   <p>The bottom raster interrupt takes one from the timer every 50 frames (<code>$06AB</code>). Most rounds start it at 30. Round 56 starts at 10, and every round from 57 on at 20 (<code>$392A</code>). In the running game the banner came 1,500 frames after play began and the Barons 500 frames after that.</p>
   <p>When the timer runs out, every enemy turns angry: its routine gets an extra run on every second turn, which makes the enemy half as fast again. When the timer runs out again, each player gets a Baron of their own (<code>$1473</code>). A Baron moves through walls in straight runs towards its player, first along one axis and then the other, pausing 30 passes between runs. Each run is one cell longer than the last, up to 15. No routine removes a Baron except the death of its player or the end of the round.</p>

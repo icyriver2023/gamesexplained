@@ -339,7 +339,11 @@ recipe in `orientation.md`, stepped by frames.
   took one from `enemies_left`, threw the enemy (state `$0B`) and left
   food of rank 1.
 - **Timer.** With the players made safe, `hurry_stage` became 1 1,500
-  frames after play began and the Barons appeared 500 frames later.
+  frames after play began and the Baron's object appeared 500 frames
+  later. The Baron is drawn only when its jingle has ended, because
+  `barons_appear` waits for the tune inside the pass loop. It then moved
+  one cell along X, two along Y, and four along Y again, the X run in
+  between ending at once because it was already in its player's column.
 - **EXTEND.** `extend_bits` set to `$3F`: the scene ran, lives went
   from 3 to 4 and the round from 1 to 2.
 - **Round 100.** Reached by poking `level`: `boss_hits` was 50, the pass
