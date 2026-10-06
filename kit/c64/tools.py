@@ -149,6 +149,28 @@ def vice(machine="x64sc"):
         os.symlink(os.path.relpath(share, env["XDG_DATA_HOME"]), data)
     start(virtual_display([exe, "-mcpserver", "-mcpserverport", str(VICE_PORT)], env), os.path.join(LOGS, "vice.log"), env=env, cwd=VICE_DIR,
           port=VICE_PORT, name="emulator")
+    if not mcp_answers(VICE_PORT):
+        print(f"but its MCP server did not answer a first call within 10 s: the port is open and the emulated machine is not\n"
+              f"running, so every call (check-emulator too) will wait. Seen on macOS when the default sound output never\n"
+              f"answered; kit/c64/INSTALL.md, 'The emulator is up and answers nothing', has the test and the cure.")
+
+
+def mcp_answers(port, timeout=10):
+    """Does the emulator's MCP server answer a call? The server takes the connection as soon as the
+    process is up, but it answers only from the emulated machine's own thread, so an emulator whose
+    machine never started (its CPU thread waiting on the host's sound device, say) has an open port,
+    reads as up, and answers nothing. One `initialize`, with a short timeout, tells the two apart."""
+    import json, urllib.request
+    req = urllib.request.Request(f"http://127.0.0.1:{port}/mcp", headers={"Content-Type": "application/json",
+                                 "Accept": "application/json, text/event-stream"},
+                                 data=json.dumps({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {
+                                     "protocolVersion": "2024-11-05", "capabilities": {},
+                                     "clientInfo": {"name": "kit", "version": "0"}}}).encode())
+    try:
+        urllib.request.urlopen(req, timeout=timeout).read()
+        return True
+    except Exception:
+        return False
 
 
 def r2000_exe():

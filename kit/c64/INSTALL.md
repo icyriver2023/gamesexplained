@@ -426,6 +426,26 @@ macOS arm64.
   fast, and a test that halts, pokes, runs and reads is a dozen calls. It
   also carries the joystick workaround; see
   `kit/skills/c64/tool-vice-mcp/workarounds.md`.
+- **The emulator is up and answers nothing.** `tools.py vice` says the
+  emulator is up, and then the first call, `check-emulator` included,
+  waits for ever; `tools/logs/vice.log` ends at `Queuing trap dispatch
+  for: initialize` and the process uses almost no processor time. The
+  port opens as soon as the process starts, but the server answers from
+  the emulated machine's own thread, and that thread has not started. On
+  6 October 2026 (v3.13.2, macOS 15.6 arm64) it was waiting in CoreAudio:
+  `sample <pid> 1` showed `AudioComponentInstanceNew` under it, and the
+  Mac's default sound output was a remote-desktop program's virtual
+  device that never answered. Stop the emulator, put VICE's own setting
+  in `tools/vice-home/config/vice/vicerc`,
+
+  ```
+  [C64SC]
+  SoundDeviceName="dummy"
+  ```
+
+  and start it again: the SID is still emulated, and `vice_sid_get_state`
+  still reads it. `tools.py vice` now makes one call after starting and
+  says so when it is not answered.
 - **The disassembler** binds port 3000 with no option to change it, and
   only one instance can run on a port ("Another program on port 3000" is
   the way to a second). Drive it with

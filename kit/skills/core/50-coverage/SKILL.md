@@ -94,6 +94,14 @@ format, how to check the result against it, and how to read it back
   count.
 - **Decide "routine" by the bytes, not the symbol type.** A renamed jump
   target that starts a routine is a routine.
+- **Name what is drawn from its picture, not from its handler.** Several
+  kinds of one thing (the shots, the pick-ups, the special bubbles) have
+  handlers that differ by a step size or a turn, and the movement reads
+  as any of them. Before naming a kind, follow its draw routine to the
+  picture it shows and its colour, and render the picture
+  (`20-features`, "Picture reference"). One run named its water as
+  lightning and its fire as water from the handlers alone, and corrected
+  thirty comments when the pictures were drawn.
 - **False symbols exist.** The skip idiom (a two-byte or three-byte opcode
   used to skip the next instruction) makes the disassembler mint a symbol
   for an "address" that is really an operand. Explain it as such rather
