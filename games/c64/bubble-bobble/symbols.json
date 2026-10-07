@@ -14958,7 +14958,7 @@
   {
    "address": 1132,
    "type": "line",
-   "text": "Draw both players' remaining lives as dots on the panel, up to seven each, in both screen buffers, then run the rejoin check."
+   "text": "Draw both players' remaining lives as dots on the panel, up to seven each, in both screen buffers, then run the rejoin check. The rejoin check runs twice, once at the end of each row, since draw_lives_row ends in the JMP at $049D."
   },
   {
    "address": 1147,
@@ -15278,7 +15278,7 @@
   {
    "address": 5054,
    "type": "line",
-   "text": "Count down each object's lifetime. At zero: a plain bubble bursts by itself (type $3A); a bubble with an enemy lets it out angry, in the state enemy_release_state, with its frame set to 0; an enemy's readied shot (type $42) is freed. In the last 16 passes a plain bubble alternates with the blink type $48 and a carried enemy's sprite flickers. Then it counts the slots that are free or ending (type $34 or more); if fewer than two are, the table is nearly full and one plain bubble is burst to make room."
+   "text": "Count down each object's lifetime. At zero: a plain bubble bursts by itself (type $3A); a bubble with an enemy lets it out angry, in the state enemy_release_state, with its frame set to 0; an enemy's readied shot (type $42) is freed. In the last 16 passes a plain bubble alternates with the blink type $48 and a carried enemy's sprite flickers. Then it counts the slots that are free or ending (type $34 or more); if fewer than two are, the table is nearly full and one plain bubble is burst to make room. Two plain bubbles are burst to make room, not one: the JSR to burst_one_plain at $145C and then the fall into it at $145F."
   },
   {
    "address": 5215,
@@ -15363,7 +15363,7 @@
   {
    "address": 6227,
    "type": "line",
-   "text": "With A the back screen's high byte: rebuild the row-address high bytes, colour the two items, set colour RAM for each object of type below $18 or type $4C (the bubbles and the falling food): two cells a row, or three when it has a sub-column, in the two or three rows it covers; restore from the clean copy at $8B00 every cell an object covered two passes ago; draw the items' four characters; give the ten cells of the water stream their colour ($0B); restore the ten cells under the giant falling block and step that block."
+   "text": "With A the back screen's high byte: rebuild the row-address high bytes, colour the two items, set colour RAM for each object of type below $18 or type $4C (the bubbles and the falling food): two cells a row, or three when it has a sub-column, in the two or three rows it covers; restore from the clean copy at $8B00 every cell an object covered two passes ago; draw the items' four characters; give the ten cells of the water stream their colour ($0B); restore the ten cells under the giant falling block and step that block. At $18C8 the ADC object_col,X takes the carry of the CMP #3 before it, so for the first row of a bubble with a non-zero sub-row the colour cells start one column to the right."
   },
   {
    "address": 6358,
@@ -15428,7 +15428,7 @@
   {
    "address": 7357,
    "type": "line",
-   "text": "Run from irq_top every other frame: read both joysticks into the first two input bytes, then for each actor run its drop-in or its state handler (an actor with the fast flag gets a second call on every second run; one whose wait counter is running only has its idle animation stepped), skip enemies while the clock's freeze lasts, and finally test each player in state 1 against every ordinary enemy within 12 pixels: a touch sets the player's state to $0E. On the boss's round it moves the boss instead."
+   "text": "Run from irq_top every other frame: read both joysticks into the first two input bytes, then for each actor run its drop-in or its state handler (an actor with the fast flag gets a second call on every second run; one whose wait counter is running only has its idle animation stepped), skip enemies while the clock's freeze lasts, and finally test each player in state 1 against every ordinary enemy within 12 pixels: a touch sets the player's state to $0E. On the boss's round it moves the boss instead. The STA actor_state,Y at $1D73 and $1E27 is what the trainer's invincibility turns into an LDA ($B9), so with it on a touch sets no state (cheats.md)."
   },
   {
    "address": 7549,
@@ -15548,7 +15548,7 @@
   {
    "address": 8961,
    "type": "line",
-   "text": "Step the blowing animation, which counts down from 6; on its third call (count 4) create the bubble in a free object slot at the player's position: type $16 (just blown), lifetime $7D, the player's travel distance, direction, speed and reload from the power-up table, one cell lower when the player is in a jump (rising or coming down) and four or more pixels into a cell. With fire breath in hand it uses one charge and makes a fireball (type $44) instead. Awards the blowing bonus when it is on."
+   "text": "Step the blowing animation, which counts down from 6; on its third call (count 4) create the bubble in a free object slot at the player's position: type $16 (just blown), lifetime $7D, the player's travel distance, direction, speed and reload from the power-up table, one cell lower when the player is in a jump (rising or coming down) and four or more pixels into a cell. With fire breath in hand it uses one charge and makes a fireball (type $44) instead. Awards the blowing bonus when it is on. Two BIT skips hide an LDA: $2397 is LDA #$80 (object_owner is 0 only when the frame is 9, $80 otherwise) and $23C8 is LDA #$00 (a fireball's sub-column is 2 or 0 by that bit)."
   },
   {
    "address": 9182,
@@ -15603,7 +15603,7 @@
   {
    "address": 10117,
    "type": "line",
-   "text": "State $16, an enemy frozen by the special item: light blue, falls to the nearest floor and becomes state $17."
+   "text": "State $16, an enemy frozen by the special item: light blue, falls to the nearest floor and becomes state $17. The BPL at $27B0 branches to the next instruction: when the enemy straddles two columns and only the third cell under it is solid, it falls anyway; only the first two make it lie."
   },
   {
    "address": 10187,
@@ -15648,7 +15648,7 @@
   {
    "address": 10529,
    "type": "line",
-   "text": "State $11, a beaten enemy that has landed. One enemy per run of the actor loop (the flag at $2922): pick the food for its rank from food_by_rank, colour it, and build its sprite, shape $F2 + actor number, by spreading the food's four 8 by 8 multicolour glyphs through remap_pairs into a 16 by 16 picture in the actor's sprite buffer. It then waits as state $12 for $C8 calls."
+   "text": "State $11, a beaten enemy that has landed. One enemy per run of the actor loop (the flag at $2922): pick the food for its rank from food_by_rank, colour it, and build its sprite, shape $F2 + actor number, by spreading the food's four 8 by 8 multicolour glyphs through remap_pairs into a 16 by 16 picture in the actor's sprite buffer. It then waits as state $12 for $C8 calls. The LDA fire_breath,X at $2954 indexes $A783 with an enemy's index (2-7), so it reads the food sprite address table that follows, not fire_breath."
   },
   {
    "address": 10530,
@@ -15903,12 +15903,12 @@
   {
    "address": 12687,
    "type": "line",
-   "text": "Low bytes of the per-frame routine of bonus_collect, by mode."
+   "text": "Low bytes of the per-frame routine of bonus_collect, by mode. The two tables overlap (lo: 34 32 71 from $318F, hi: 32 71 37 from $3190): modes 0 and 2 give $3234 and $3771, mode 1 would give $7132 and nothing uses it. Two routines, not three."
   },
   {
    "address": 12688,
    "type": "line",
-   "text": "High bytes of the same three routines."
+   "text": "High bytes of the same three routines. Overlaps bonus_step_lo by two bytes: see it."
   },
   {
    "address": 12691,
@@ -16023,7 +16023,7 @@
   {
    "address": 14193,
    "type": "line",
-   "text": "Per-frame routine of the secret room: a player who walks to X $8C on the bottom floor once only one block is left drops through to the exit; when a player reaches the bottom (Y $DD) the room ends, with the screen flashing."
+   "text": "Per-frame routine of the secret room: a player who walks to X $8C on the bottom floor once only one block is left drops through to the exit; when a player reaches the bottom (Y $DD) the room ends, with the screen flashing. The drop of the player (Y $9D to $DD at X $8C) happens while pass_count is below $0E, twelve or fewer blocks left; the exit needs pass_count 1 (every block taken) and the player at Y $DD."
   },
   {
    "address": 14279,
@@ -16103,7 +16103,7 @@
   {
    "address": 15571,
    "type": "line",
-   "text": "Draw handler for type $3C, the second stage of a burst (type $3A goes to draw_pop_start): advance the type by two, to $3E, and draw the first pop picture."
+   "text": "Draw handler for type $3C, the second stage of a burst (type $3A goes to draw_pop_start): advance the type by two, to $3E, and draw the first pop picture. The ADC #$10 at $3CFC that places the second graphic column takes the carry the caller left: for a letter bubble's pop (was 8 or more) that column starts one line on."
   },
   {
    "address": 15574,
@@ -17123,7 +17123,7 @@
   {
    "address": 31742,
    "type": "line",
-   "text": "Return in $40/$41 the address in the collision map of object X's cell, and in A its sub-row."
+   "text": "Return in $40/$41 the address in the collision map of object X's cell, and in A its sub-row. The ADC's carry is the ASL's, bit 7 of the row."
   },
   {
    "address": 31764,
@@ -17798,7 +17798,7 @@
   {
    "address": 42024,
    "type": "line",
-   "text": "Start of every bonus scene: stop the actors, end all objects, restore the playfield, remove the enemies and both items, stop the timer, clear the bonus block lists and the item glyphs, and load the scene's digit glyphs (160 bytes from small_digits) into characters $60-$73. Leaves three pointers at the second row of the map, the screen and colour RAM."
+   "text": "Start of every bonus scene: stop the actors, end all objects, restore the playfield, remove the enemies and both items, stop the timer, clear the bonus block lists and the item glyphs, and load the scene's digit glyphs (160 bytes from small_digits) into characters $60-$73. Leaves three pointers at the second row of the map, the screen and colour RAM. It sets both delays and the timer to $FF and points_item to 0; special_item is not touched."
   },
   {
    "address": 42100,
@@ -18783,7 +18783,7 @@
   {
    "address": 57499,
    "type": "line",
-   "text": "Draw the unpacked layout at $8B00 (25 rows of four bytes, a bit per cell of 32 columns) into the screen at $5400: a set bit is the wall tile (character $15), and each tile casts a shadow on the empty cells to its right, below and diagonally (characters $0A-$0F). Then the 2 by 2 wall blocks down both sides in columns 0-1 and 30-31, and a little tidying of the top row."
+   "text": "Draw the unpacked layout at $8B00 (25 rows of four bytes, a bit per cell of 32 columns) into the screen at $5400: a set bit is the wall tile (character $15), and each tile casts a shadow on the empty cells to its right, below and diagonally (characters $0A-$0F). Then the 2 by 2 wall blocks down both sides in columns 0-1 and 30-31, and a little tidying of the top row. The shadow under a tile is $0A for a blank cell and $0D otherwise (an LDA #$0D hidden in the BIT at $E0EE, where the branch at $E0EA lands), and the cell to its right $0C for blank, $0F over $0A or $0D, else $0E (the LDA #$0C hidden in the BIT at $E0DC)."
   },
   {
    "address": 57737,
@@ -19173,7 +19173,7 @@
   {
    "address": 59912,
    "type": "line",
-   "text": "Enemy kind 2 (state 2) and the movement of the shooters. Falls when nothing is underfoot. On the ground it follows its input bits: bit 0 walks left, bit 1 right, bit 2 starts a jump. chase_timer decides whether it may climb: when allowed it jumps to a platform it finds overhead or across a gap at the end of its floor."
+   "text": "Enemy kind 2 (state 2) and the movement of the shooters. Falls when nothing is underfoot. On the ground it follows its input bits: bit 0 walks left, bit 1 right, bit 2 starts a jump. chase_timer decides whether it may climb: when allowed it jumps to a platform it finds overhead or across a gap at the end of its floor. At $EAB1 the ADC #$08 runs with the carry the CMP #$06 left set, so the cell probed is map_ptr + 9."
   },
   {
    "address": 60175,
@@ -19898,7 +19898,7 @@
   {
    "address": 63623,
    "type": "line",
-   "text": "Start the sound effect whose 30-byte record is at A (low), Y (high) on voice 1: silence the voice, load pulse, control and envelope, the starting note, gate and release times, and the 24 modulation bytes, then restart the modulations."
+   "text": "Start the sound effect whose 30-byte record is at A (low), Y (high) on voice 1: silence the voice, load pulse, control and envelope, the starting note, gate and release times, and the 24 modulation bytes, then restart the modulations. The LDA live_pulse_start_hi,Y at $F8E9 runs with Y = $FF (the loop before it ends there), so it reads $F431, not $F332."
   },
   {
    "address": 63778,

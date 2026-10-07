@@ -4,6 +4,18 @@
 described (`coverage.py`). What Gold needs is a person: read the page
 section by section, cut what is dull, and say what deserves more.
 
+## The Play tab
+
+- The port's check covers rounds 1 to 3 and round 100 from saved
+  moments, with every item and scene driven by the items group's tests;
+  rounds 4 to 99 are checked only through the round builder's tests and
+  the round-skip sessions, not by play.
+- Two players, the super mode and the boss fight were run in the port's
+  tests, not by a person at the keyboard.
+- The 1.7 % of passes that differ from the C64 are the actor interrupt's
+  race (`play.html`, section 01); a port that yields between objects, with
+  the cost of each, would land the interrupt closer to where it falls.
+
 ## The listing
 
 - The comments on tables and variables (767 of the 1,194) were sampled,

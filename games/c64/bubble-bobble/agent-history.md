@@ -113,3 +113,73 @@ the game's clean copy for rounds 1 and 3, and found that the unpacker
 forces the left wall on before the shadows are drawn. No Firefox was
 installed, so the page was checked with the Mac's own Chrome, headless,
 with its profile in `tools/chrome-profile`.
+
+## 6-7 October 2026, a second session, claude-fable-5-1, kit 0.0.93: the Play tab
+
+The contributor asked for the whole game playable in the browser as a
+recreation, not an emulator (`kit/skills/core/70-minisite/play.md`), with
+sound, and allowed up to four agents at once.
+
+**The frame first.** The port runs on the game's own 64 KB, loaded from
+`listing.json`, one JavaScript function per listing label, with the
+chips behind `P.io`. Routines that wait are generators, and a reachability
+walk from `wait_frame` over the call graph fixed the set (`GEN` in
+`work/port/src/core.js`) before any group was given out; the walk missed
+`init_round_state`, which plays a tune through a JSR four instructions
+from its end, and the long lockstep sessions found it at the first round
+change. The main program, the three raster handlers and the waits were
+written first (`src/flow.js`) and run in lockstep with everything else
+standing in by the game's own code; a stand-in that waits runs the
+game's routine in the kit's simulator up to the frame counter's poll and
+polls from JavaScript, so a whole session could run with one group
+ported. Twenty-two moments of play were saved from the snapshots with
+random input (`work/port/states/`), and a harness ran a port routine and
+the game's routine from the same random moment and compared all memory,
+colour RAM and the chip registers.
+
+**Six agents, four at once.** The 271 routines were split into seven
+groups by address: objects, actors, items, screen, round, enemy
+intelligence with the music driver, and the flow. Each agent got the
+same brief (`work/port/BRIEF.md`), its ranges, and the harness; each
+reported cases passed per routine, lockstep results against the flow-only
+baseline, every place its port departs from the instructions, and the
+listing comments it found wrong. One claim per agent was checked against
+the listing before the report was believed: the double burst in
+`age_objects`, the overlapping `bonus_step` tables, the hidden LDA under
+the BIT at `$E0EE`, the carry into the ADC at `$EAB1`, the BPL to the
+next instruction at `$27B0`, the two rejoin checks of `draw_lives`. All
+held. Sixteen comments were corrected in `symbols.json` (`work/ann/30-port.txt`)
+and the listing rebuilt.
+
+**What the lockstep showed.** 47 sessions, 52,000 passes, memory
+compared at every pass start: 98.3 % identical, none out of step. Every
+differing pass has the same shape, the renderer's scratch pointers
+(`$0D`, `$18`-`$1B`, `$31`-`$3A`, `repair_row_b`) and one object slot: the
+game runs `update_actors` inside the line-50 interrupt, and when that
+falls in the middle of the bubble loop a bubble the player has just blown
+or an enemy just caught is seen by half the loop in the game and by none
+or all of it in the port. The differences come in pairs two passes
+apart, the two screen buffers. Two smaller things the sessions caught in
+the flow: the kit's lockstep counts a checkpoint repeated with nothing
+between as one, so the title loop's three score rows needed a turn
+between them; and the frame the pass loop reads after `check_deaths` has
+waited for a death must be read directly, since the game's own polling
+reads come first in that stretch.
+
+**Pacing.** A pass is three frames by the game's own wait, so the page
+keeps a PAL clock and moves it by the cycles each stretch of the main
+loop took on the kit's machine (the median over the sessions, the
+interrupts' own cycles taken out) and by each handler's cycles,
+`update_actors` apart. From four saved moments, 600 frames of the same
+input gave the same pass count, the same player position and the same
+score on the machine and on the page.
+
+**The page.** The chips of the page start as the KERNAL leaves them: the
+game never sets CIA 1's data direction and only ANDs `$D011`, so a chip
+state of zeros gave no keys and a black screen. `DEC $D019` acknowledges
+through the read-modify-write's first store, which the port's handlers
+now make. The page was driven headless over Chrome's DevTools protocol
+(`work/port/test/browser.js`): it starts a round, runs at 50 frames a
+second, takes keys, and reports the console. The first build was a
+script three hundred copies long, because a string replacement had
+expanded `$'` inside the code.

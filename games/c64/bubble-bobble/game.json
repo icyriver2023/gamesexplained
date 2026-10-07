@@ -30,7 +30,8 @@
     "emulator": "VICE via vice-mcp: release v3.13.2, v3.13.2-macos-arm64-gui.dmg (x64sc, PAL; host sound device set to dummy)",
     "disassembler": "regenerator2000 0.9.20",
     "python": "3.14.3",
-    "host": "macOS 15.6 arm64 (Mac mini)"
+    "host": "macOS 15.6 arm64 (Mac mini)",
+    "node": "24.18.0 (the port's tests and the page check), Chrome headless over the DevTools protocol for the page"
   },
   "model": "claude-fable-5-1",
   "step_models": {
@@ -38,6 +39,9 @@
       "claude-fable-5-1"
     ],
     "60-verify": [
+      "claude-fable-5-1"
+    ],
+    "70-minisite": [
       "claude-fable-5-1"
     ]
   },
