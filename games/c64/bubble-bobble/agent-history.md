@@ -138,17 +138,18 @@ the game's routine from the same random moment and compared all memory,
 colour RAM and the chip registers.
 
 **Six agents, four at once.** The 271 routines were split into seven
-groups by address: objects, actors, items, screen, round, enemy
-intelligence with the music driver, and the flow. Each agent got the
+groups by address (objects, actors, items, screen, round, enemy
+intelligence with the music driver, and the flow), one agent each but
+the flow. Each agent got the
 same brief (`work/port/BRIEF.md`), its ranges, and the harness; each
 reported cases passed per routine, lockstep results against the flow-only
 baseline, every place its port departs from the instructions, and the
 listing comments it found wrong. One claim per agent was checked against
-the listing before the report was believed: the double burst in
+the listing before the report was believed (the double burst in
 `age_objects`, the overlapping `bonus_step` tables, the hidden LDA under
 the BIT at `$E0EE`, the carry into the ADC at `$EAB1`, the BPL to the
-next instruction at `$27B0`, the two rejoin checks of `draw_lives`. All
-held. Sixteen comments were corrected in `symbols.json` (`work/ann/30-port.txt`)
+next instruction at `$27B0`, and the two rejoin checks of `draw_lives`),
+and all six held. Sixteen comments were corrected in `symbols.json` (`work/ann/30-port.txt`)
 and the listing rebuilt.
 
 **What the lockstep showed.** 47 sessions, 52,000 passes, memory
@@ -179,7 +180,7 @@ game never sets CIA 1's data direction and only ANDs `$D011`, so a chip
 state of zeros gave no keys and a black screen. `DEC $D019` acknowledges
 through the read-modify-write's first store, which the port's handlers
 now make. The page was driven headless over Chrome's DevTools protocol
-(`work/port/test/browser.js`): it starts a round, runs at 50 frames a
-second, takes keys, and reports the console. The first build was a
+(`work/port/test/browser.js`), which starts a round, lets the page run
+for some seconds, presses keys, and reports the console. The first build was a
 script three hundred copies long, because a string replacement had
 expanded `$'` inside the code.

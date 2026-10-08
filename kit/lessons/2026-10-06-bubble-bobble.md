@@ -39,14 +39,14 @@ rate in a second; only a full audit by a fresh agent did, and it
 rewrote 99 of 367. `50-coverage` now says to write each description
 with its listing on screen.
 
-**A game that runs its actors in the interrupt sets a floor under the
-lockstep.** Bubble Bobble moves the players and the enemies inside the
+**A game that runs its actors in the interrupt leaves the lockstep a
+floor it cannot go below.** Bubble Bobble moves the players and the enemies inside the
 raster interrupt at line 50, every other frame, while the main loop is
 halfway through its bubbles. The lockstep replays an interrupt between
 two of the port's routines, so when the game's interrupt fell inside one,
 the game's routine saw half the actors moved and the port's none: 1.7 %
 of 52,000 passes differed, always by the renderer's scratch and one
 object slot, never by anything else, and never out of step. That is the
-game's own race, not the port's error, and the number to expect from a
-game of this shape; the routine-by-routine checks, which have no
-interrupt, are the proof the lockstep cannot be there.
+game's own race, and the number to expect from a game of this shape. For
+those passes the proof is the routine-by-routine check, which runs each
+routine with no interrupt at all.
