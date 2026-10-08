@@ -1,0 +1,43 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="reference/bb-page.css">
+<!-- tabs -->
+<header class="hero">
+  <p class="eyebrow">{{platform}} · {{year}} · {{publisher}}</p>
+  <h1>{{title}}</h1>
+  <p class="sub">Why the bubbles are characters and not sprites, and one frame rebuilt from memory.</p>
+</header>
+<main class="wrap">
+
+<section>
+  <p class="fig">01 · The picture</p>
+  <h2 class="t">Bubbles are characters, redrawn into fresh glyphs every pass</h2>
+  <p class="lede">The eight sprites go to the two dragons and six enemies. Everything else that moves is drawn by rewriting the character set.</p>
+  <div class="plate">
+    <div class="bb-toggles">
+      <label>object <select id="bb-pic"></select></label>
+      <label>shift <input type="range" id="bb-shift" min="0" max="3" value="0"> <span id="bb-shift-v" class="bb-num">0</span></label>
+    </div>
+    <div class="bb-stage">
+      <div><canvas id="bb-s-bg" width="144" height="96"></canvas>what the cells show now</div>
+      <div><canvas id="bb-s-mask" width="144" height="96"></canvas>AND the mask</div>
+      <div><canvas id="bb-s-gfx" width="144" height="96"></canvas>OR the picture</div>
+      <div><canvas id="bb-s-out" width="144" height="96"></canvas>six new glyphs</div>
+    </div>
+    <p class="cap"><b>The renderer's merge</b>, done by this page with the pictures and masks at <code>$8000</code>-<code>$9ADF</code>, over round 1's wall tile. A picture is 24 pixels wide and 16 high, stored as three columns of 16 bytes, one column per character cell. Each picture exists in four versions shifted two pixels apart, which is how a bubble moves in steps finer than a cell.</p>
+  </div>
+  <p>Up to eighteen objects are alive at once: bubbles, the letters, shots, flames, the Barons. Every pass, <code>$E90E</code> hands each object nine unused character codes, starting at <code>$5E</code>. For each cell the object touches, <code>$E7CF</code> reads the glyph already on screen there, masks the object's shape out of it, ORs the picture in, and writes the result as one of the new glyphs. Then it puts the new character code into the screen cell. A bubble passing in front of a platform is therefore a set of glyphs that are part platform and part bubble.</p>
+  <p>The game keeps two screens and two character sets and draws into the pair that is not on display. The raster interrupt at <code>$072E</code> switches <code>$D018</code> between them. Before drawing, <code>$1853</code> repairs the hidden screen from a clean copy of the round kept at <code>$8B00</code>, restoring only the cells that objects covered two passes earlier.</p>
+  <div class="plate">
+    <canvas id="bb-frame" class="bb-canvas"></canvas>
+    <p class="cap"><b>One frame of round 1, rebuilt from memory</b> by the site's model of the video chip from a recording of the registers and RAM. Compared with the emulator's own picture of the same frame, all 104,448 pixels match. The bubbles are characters <code>$5E</code> and up; only the dragon and the three robots are sprites.</p>
+  </div>
+</section>
+</main>
+<footer style="margin:16px 0 0;padding:22px var(--gx) 0;border-top:1px solid #e0ded8;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:12px;color:#80838a"><a href="/kit.html" style="color:#1f5fa8;text-decoration:none">How this page was made</a></footer>
+<script src="../../lib/c64.js"></script>
+<script src="reference/bb-core.js"></script>
+<script src="reference/bb-page.js"></script>

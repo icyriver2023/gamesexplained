@@ -1,0 +1,38 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="reference/bb-page.css">
+<!-- tabs -->
+<header class="hero">
+  <p class="eyebrow">{{platform}} · {{year}} · {{publisher}}</p>
+  <h1>{{title}}</h1>
+  <p class="sub">Two sticks, the keys the game reads, and what each move costs in pixels and frames.</p>
+</header>
+<main class="wrap">
+
+<section>
+  <p class="fig">01 · Controls</p>
+  <h2 class="t">Two sticks, and what each move costs in frames</h2>
+  <p class="lede">The game reads both joysticks every other frame, inside the raster interrupt, and never the keyboard during play except for two keys.</p>
+  <div class="plate">
+    <table class="bb-table">
+      <tr><th>Move</th><th>What happens</th><th>Where</th></tr>
+      <tr><td>Left, right</td><td>Two pixels a step, 25 steps a second. A wall stops the step unless the player is above Y <code>$2D</code> or between two cells.</td><td><code>$226B</code></td></tr>
+      <tr><td>Up</td><td>A jump of 15 steps up the arc, 43 pixels in the running game. The player drifts sideways only when the stick leans the way the player already faces.</td><td><code>$222B</code></td></tr>
+      <tr><td>Up, in the air</td><td>With up held, the game looks for a bubble under the player and starts the jump again from it: the manual's "bounce on the bubbles".</td><td><code>$217A</code></td></tr>
+      <tr><td>Fire</td><td>A bubble, then eight passes of the main loop before the next. The bubble flies 64 pixels in eight passes, small for three, medium for three, full size from the seventh.</td><td><code>$22E8</code>, <code>$7F53</code></td></tr>
+      <tr><td>Fire, when out</td><td>A player with no lives rejoins on their own stick while a credit is left, with three lives in play and a score of zero.</td><td><code>$052A</code></td></tr>
+      <tr><td>RUN/STOP</td><td>Pauses. The game waits for the key to go up, come down and go up again, with the round timer held.</td><td><code>$7E80</code></td></tr>
+      <tr><td>Q</td><td>Quits: the sound stops, and 25 frames later the score table is back.</td><td><code>$7EC1</code></td></tr>
+    </table>
+    <p class="cap"><b>The player's routine runs on every other frame</b> (<code>$1CBD</code>), so a step a call is 25 a second. The shoe item sets a flag that gives the player a second call on alternate runs: three steps in four frames.</p>
+  </div>
+  <p>Player 1 is the stick in port 2 and player 2 the stick in port 1 (<code>$1CBD</code> reads <code>$DC00</code> and then <code>$DC01</code>). On the title page fire on either stick goes on to the score table, where 1 or 2 picks the number of players. The C64-Wiki says Space switches between one and two players; nothing in the code reads the Space key, and the jump height and the bubble's flight above were measured in the emulator from the round-start snapshot.</p>
+</section>
+</main>
+<footer style="margin:16px 0 0;padding:22px var(--gx) 0;border-top:1px solid #e0ded8;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:12px;color:#80838a"><a href="/kit.html" style="color:#1f5fa8;text-decoration:none">How this page was made</a></footer>
+<script src="../../lib/c64.js"></script>
+<script src="reference/bb-core.js"></script>
+<script src="reference/bb-page.js"></script>

@@ -1,0 +1,48 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="reference/bb-page.css">
+<!-- tabs -->
+<header class="hero">
+  <p class="eyebrow">{{platform}} · {{year}} · {{publisher}}</p>
+  <h1>{{title}}</h1>
+  <p class="sub">The twelve tunes, played by the game's own music driver, ported, through the site's model of the SID.</p>
+</header>
+<main class="wrap">
+
+<section>
+  <p class="fig">01 · The sound</p>
+  <h2 class="t">Twelve tunes, played by the game's own driver</h2>
+  <p class="lede">The music is a list of events per voice (a note and a length, or a command), read once a frame by a driver of 1,200 bytes. The player below is that driver, ported, playing through the site's model of the SID.</p>
+  <div class="plate">
+    <div id="bb-sid"></div>
+    <p class="cap"><b>The driver's writes, frame by frame</b> (<code>$F53C</code>). A tune record (<code>$F922</code>) is the three voices' data addresses and a tempo, the frames in the shortest note. A voice's data is notes 0-<code>$5E</code> with a length index, rests, and commands <code>$80</code>-<code>$9C</code> for loops, pattern calls, transposition, instruments, arpeggios and the filter (<code>$F240</code>). An instrument is 29 bytes (<code>$F2AE</code>): a four-step frequency slide, a pulse sweep, a waveform, an envelope and a release time. The filter runs on one chip's curve; real 6581s differ. The title tune lives at <code>$8B00</code>, where the first game writes its copy of the screen, so the C64 plays it once; here it plays as often as you like.</p>
+  </div>
+  <p>Six sound effects share voice 1 with the music (<code>$F887</code>): the jump, a bubble, a burst, an item, an extra life and the EXTEND letter. An effect is a frequency slide and a pulse sweep of its own, started when no tune is playing over it, and the round tune resumes on that voice when the effect ends.</p>
+</section>
+</main>
+<footer style="margin:16px 0 0;padding:22px var(--gx) 0;border-top:1px solid #e0ded8;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:12px;color:#80838a"><a href="/kit.html" style="color:#1f5fa8;text-decoration:none">How this page was made</a></footer>
+<script src="../../lib/c64.js"></script>
+<script src="../../lib/sid.js"></script>
+<script src="reference/bb-core.js"></script>
+<script src="reference/bb-page.js"></script>
+<script src="reference/bb-music.js"></script>
+<script>
+window.addEventListener('load', async function () {
+  const root = document.getElementById('bb-sid');
+  if (!window.C64Sid) { root.textContent = 'This player needs the site\u2019s shared script, lib/sid.js.'; return; }
+  let G; try { G = await C64.load('listing.json'); } catch (e) { root.textContent = e.message; return; }
+  C64Sid.mount(root, {
+    driver: BBMUSIC.createDriver,
+    data: G.ram,
+    tunes: ['The opening story', 'The round', 'The boss round', 'The freeze', 'Game over', 'The round, a step faster', 'EXTEND', 'The title page', 'Hurry up', 'The Barons', 'The secret room', 'The ending'],
+    filter: '6581',
+    rows: [
+      { k: 'Data', f: (v) => '$' + v.data.toString(16).toUpperCase().padStart(4, '0') },
+      { k: 'Transpose', f: (v) => String(v.transpose > 127 ? v.transpose - 256 : v.transpose) },
+    ],
+  });
+});
+</script>

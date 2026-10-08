@@ -1,0 +1,121 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="reference/bb-page.css">
+<!-- tabs -->
+<header class="hero">
+  <p class="eyebrow">{{platform}} · {{year}} · {{publisher}}</p>
+  <h1>{{title}}</h1>
+  <p class="sub">What a bubble releases when it bursts, what a chain of enemies pays, the clock that brings the Barons, the items, the doors, and the boss.</p>
+</header>
+<main class="wrap">
+
+<section>
+  <p class="fig">01 · Special bubbles</p>
+  <h2 class="t">What the three special bubbles release</h2>
+  <p class="lede">Seventy of the hundred rounds have vents at the top and bottom of the screen that send in bubbles of their own.</p>
+  <div class="bb-two">
+    <div class="plate"><img class="bb-shot" src="reference/water-stream.png" alt="A water stream"><p class="cap">Water: a stream ten cells long that falls, then runs along the floor.</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/fire-run.png" alt="A fire run"><p class="cap">Fire: a flame that drops and spreads along the floor it lands on.</p></div>
+  </div>
+  <p>The main loop makes one pass every three frames. On every 23rd pass, a little over a second apart, a vent may release a bubble, as long as fewer than ten special bubbles are afloat (<code>$0BED</code>). The round's data says which kinds it may be: water in 14 rounds, fire in 21, thunder in 8. Bursting any of them scores 100 points and sets its contents loose (<code>$3D2D</code>).</p>
+  <p>Water becomes a stream whose head moves a cell at a time: down while nothing is under it, then sideways along the floor, then down again at the edge (<code>$1B40</code>). Whatever the head touches is carried with it. An enemy carried off the bottom of the screen counts as beaten. A player is set down unharmed.</p>
+  <p>Fire becomes a flame that falls half a cell a pass. Where the flame lands, a row of fire spreads up to 16 cells to each side, by a random amount, and burns down through six stages (<code>$11B7</code>, <code>$1319</code>). An enemy standing in the row while it burns high is beaten.</p>
+  <p>Thunder becomes a bolt that flies level, away from the side the player is facing, and beats every enemy in its path (<code>$10D6</code>). The bolt is also the only thing that hurts the boss of round 100.</p>
+  <div class="plate"><img class="bb-shot" src="reference/extend.png" alt="The EXTEND scene"><p class="cap">The scene that plays when one player holds all six letters. It was reached in the running game by setting the six letter bits, and it added a life and moved on to the next round.</p></div>
+  <p>The same vents hand out the letters of EXTEND. When a round with vents is set up, the game tosses a coin. On heads, the first one to four bubbles from the vents are letters, and the vents go back to their usual bubbles afterwards (<code>$0C9C</code>). Only five letter bubbles exist: the E counts as the first E for a player who has none and as the second for a player who has one.</p>
+</section>
+
+<section>
+  <p class="fig">02 · Scoring</p>
+  <h2 class="t">What a chain of burst enemies pays</h2>
+  <p class="lede">A burst bubble bursts every bubble within 24 pixels of it, and those burst their neighbours in turn.</p>
+  <div class="plate">
+    <div class="bb-toggles"><label>enemies burst in one chain <input type="range" id="bb-chain" min="1" max="6" value="3"> <span id="bb-chain-v" class="bb-num">3</span></label></div>
+    <div class="bb-row">
+      <div><div class="fig">chain bonus</div><div class="bb-big" id="bb-chain-bonus"></div></div>
+      <div><div class="fig">food they leave</div><div class="bb-foods" id="bb-chain-foods"></div></div>
+      <div><div class="fig">all eaten</div><div class="bb-big" id="bb-chain-total"></div></div>
+    </div>
+    <p class="cap"><b>The tables at <code>$AB52</code> and <code>$A79A</code>.</b> The bonus is paid when the chain stops growing. Each beaten enemy then lands as food, and the later it was in the chain the better the food. An enemy beaten some other way leaves better food still: 8,000 points if water carried it off, 9,000 if fire burnt it, and 10,000 for a thunder bolt or a special item. Bursting one held enemy scored 1,000 in the running game, and the food it left was the first of the row.</p>
+  </div>
+  <table class="bb-table">
+    <tr><th>Event</th><th>Points</th></tr>
+    <tr><td>Bursting a plain or letter bubble</td><td class="bb-num">10</td></tr>
+    <tr><td>Bursting a water, fire, or thunder bubble</td><td class="bb-num">100</td></tr>
+    <tr><td>A points item</td><td class="bb-num">10 to 12,000</td></tr>
+    <tr><td>Food from a leftover bubble on a food round</td><td class="bb-num">700</td></tr>
+    <tr><td>A block in a bonus room</td><td class="bb-num">500</td></tr>
+    <tr><td>Taking every block in a bonus room</td><td class="bb-num">100,000</td></tr>
+    <tr><td>A block in a secret room</td><td class="bb-num">12,000</td></tr>
+    <tr><td>Round 100</td><td class="bb-num">1,000,000</td></tr>
+  </table>
+  <p>A score is three bytes of packed decimal, and the screen prints a fixed zero after them, so nothing in the game can score fewer than ten points. Extra lives come at 30,000, 100,000, 400,000, 1,000,000, and each million after that (<code>$F1AC</code>).</p>
+  <p>The manual's figures differ from the code's. The manual promises 500 points for a boxed-up enemy and food up to a 32,000-point diamond. The code pays 1,000 for the burst, and its best food is worth 9,000.</p>
+  <p>On rounds 1, 5, 10, 16, 23, 31, 40, 50, 61, 73, 86, and 100, every full-size plain bubble still floating when the round is cleared turns into food worth 700 points and falls (<code>$0EC5</code>). The gap between such rounds grows by one each time (<code>$59BF</code>).</p>
+</section>
+
+<section>
+  <p class="fig">03 · The clock</p>
+  <h2 class="t">Thirty seconds to "hurry up", ten more to the Barons</h2>
+  <p class="lede">The round timer counts real seconds, one for every 50 frames.</p>
+  <div class="bb-two">
+    <div class="plate"><img class="bb-shot" src="reference/hurry-up.png" alt="Round 1 with the HURRY UP banner"><p class="cap">The banner, 30 seconds into round 1.</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/baron.png" alt="Round 1 with a Baron"><p class="cap">Ten seconds later a Baron arrives for each player, here at the top left.</p></div>
+  </div>
+  <p>The bottom raster interrupt takes one from the timer every 50 frames (<code>$06AB</code>). Most rounds start it at 30. Round 56 starts at 10, and every round from 57 on at 20 (<code>$392A</code>). In the running game the banner came 1,500 frames after play began and the Barons 500 frames after that.</p>
+  <p>When the timer runs out, every enemy turns angry: its routine gets an extra run on every second turn, which makes the enemy half as fast again. When the timer runs out again, each player gets a Baron of their own, and the round tune comes back a step faster (<code>$1473</code>). A Baron moves through walls in straight runs towards its player, first along one axis and then the other, pausing 30 passes of the main loop, nearly two seconds, between runs. Each run is one cell longer than the last, up to 15. No routine removes a Baron except the death of its player or the end of the round.</p>
+  <p>A cleared round also uses the timer. When the last enemy is beaten the timer is set to nine seconds, and the seconds that were left decide how good the next round's points item will be (<code>$16F7</code>).</p>
+</section>
+
+<section>
+  <p class="fig">04 · Items</p>
+  <h2 class="t">What each special item does</h2>
+  <p class="lede">Every round has one special item. It appears 1 to 16 seconds in and stays for 12. Its number picks a routine from a table of 35.</p>
+  <div class="plate">
+    <table class="bb-table" id="bb-items"></table>
+    <p class="cap"><b>Pictures drawn from the item graphics at <code>$9AE0</code></b> in the colours of the table at <code>$A913</code>; effects read from the routines the table at <code>$2D65</code> points to. The names describe the pictures. The game stores none.</p>
+  </div>
+  <p>Nine times in sixteen a round's item is the one tied to its round number. Otherwise it is usually drawn at random from the first 32 (<code>$2B31</code>).</p>
+  <div class="bb-two">
+    <div class="plate"><img class="bb-shot" src="reference/flood.png" alt="The flood"><p class="cap">The cyan cross: the round fills from the bottom and every enemy is beaten.</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/bonus-room.png" alt="A bonus room"><p class="cap">A potion: the round becomes a bonus room with 30 seconds on the clock.</p></div>
+  </div>
+  <p>The three crosses do not match the descriptions that circulate for this version. By their stored colours, the red cross gives 19 fireballs in place of bubbles, the yellow one flashes the screen and sends a block falling across it that kills what it passes, and the cyan one floods the round from the bottom up and kills every enemy.</p>
+</section>
+
+<section>
+  <p class="fig">05 · Doors</p>
+  <h2 class="t">Secret: a player who has not died is offered doors</h2>
+  <p class="lede">Six rounds can replace their special item with a door.</p>
+  <div class="plate">
+    <table class="bb-table">
+      <tr><th>The door appears in round</th><th>It leads to</th></tr>
+      <tr><td class="bb-num">20, 30, 40, 80, 90</td><td>a secret room: 36 blocks worth 12,000 points each</td></tr>
+      <tr><td class="bb-num">50</td><td>round 70</td></tr>
+    </table>
+    <p class="cap"><b>From the item placer at <code>$2B31</code></b> and the two door routines, <code>$3621</code> and <code>$7C37</code>.</p>
+  </div>
+  <div class="plate"><img class="bb-shot" src="reference/secret-room.png" alt="The secret room"><p class="cap">The secret room, entered in the running game by putting the door item on the player in round 1. The room's counter read 37 for its 36 blocks.</p></div>
+  <p>The game keeps one bit for each player who has not yet lost a life (<code>$5B7F</code>). While either bit is set, the round after each door threshold gets a door in place of its usual item. The thresholds are rounds 19, 29, 39, and 49, then 79 and 89.</p>
+  <p>The secret room has a layout and glyphs of its own, which also spell out a message (<code>$A660</code>), and borrows the air currents of round 77. Its counter starts one above the number of blocks, and the way out opens when the counter reaches one, so all 36 blocks can be taken: 432,000 points.</p>
+</section>
+
+<section>
+  <p class="fig">06 · Round 100</p>
+  <h2 class="t">The boss gets back up</h2>
+  <p class="lede">Beating the boss takes two steps, and the second has a time limit.</p>
+  <div class="bb-two">
+    <div class="plate"><img class="bb-shot" src="reference/round-100-boss.png" alt="Round 100"><p class="cap">Round 100. The boss is nine sprites, drawn with six: a third raster interrupt moves three of them down for the bottom row (<code>$0795</code>).</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/ending.png" alt="The ending"><p class="cap">The ending, reached in the running game by forcing the boss's beaten state.</p></div>
+  </div>
+  <p>Round 100's potion turns every bubble the player blows into a thunder bubble. The boss starts with a count of 50, each bolt takes one off, and the bolt that takes the count below zero, the 51st, puts the boss into a beaten state that lasts 130 passes of the main loop, a little under eight seconds (<code>$1134</code>). A player who touches the boss in that time ends the game with a million points (<code>$A5B7</code>). If nobody does, the boss gets up with a count of 40 and moves at twice the speed.</p>
+  <p>The ending prints its three lines over a star field and walks the top two rows of the boss to and fro beneath them. It is the same whether one or two played.</p>
+</section>
+</main>
+<footer style="margin:16px 0 0;padding:22px var(--gx) 0;border-top:1px solid #e0ded8;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:12px;color:#80838a"><a href="/kit.html" style="color:#1f5fa8;text-decoration:none">How this page was made</a></footer>
+<script src="../../lib/c64.js"></script>
+<script src="reference/bb-core.js"></script>
+<script src="reference/bb-page.js"></script>

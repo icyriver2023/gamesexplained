@@ -1,0 +1,46 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="reference/bb-page.css">
+<!-- tabs -->
+<header class="hero">
+  <p class="eyebrow">{{platform}} · {{year}} · {{publisher}}</p>
+  <h1>{{title}}</h1>
+  <p class="sub">All 100 rounds drawn from the level data, with the air currents and the enemy lists.</p>
+</header>
+<main class="wrap">
+
+<section>
+  <p class="fig">01 · The rounds</p>
+  <h2 class="t">All 100 rounds, drawn from 6,670 bytes</h2>
+  <p class="lede">A round is a bitmap, one bit for each of its 32 by 23 cells. More than half the rounds store only their left side.</p>
+  <div class="plate">
+    <div class="pick"><a class="step" id="bb-prev">‹</a><select id="bb-round"></select><a class="step" id="bb-next">›</a></div>
+    <div class="bb-toggles">
+      <label><input type="checkbox" id="bb-t-air"> air currents</label>
+      <label><input type="checkbox" id="bb-t-half"> the half that is stored</label>
+      <label><input type="checkbox" id="bb-t-items" checked> item places</label>
+      <label><input type="checkbox" id="bb-t-super"> super mode</label>
+    </div>
+    <div class="bb-row">
+      <canvas id="bb-map" class="bb-canvas" width="512" height="400"></canvas>
+      <div class="bb-side">
+        <dl id="bb-info"></dl>
+        <div class="bb-enemies" id="bb-cast"></div>
+      </div>
+    </div>
+    <p class="cap"><b>Drawn by this page from the game's bytes</b> (the Source tab's listing), with the game's own unpacking rules. The decoder was checked against the running game: for rounds 1, 2, 16, 40, 41, 57, 77, 85, and 99 every one of the 800 cells of the game's collision map matched, and for ten rounds every cell's air current. Dots mark where each enemy enters. The outlined squares are where the round's points item (white) and special item (yellow) appear.</p>
+  </div>
+  <p>The layouts start at <code>$C5F2</code> and are packed end to end. A full layout takes 92 bytes, four for each of 23 rows. A mirrored round keeps two bytes a row, and <code>$E32A</code> writes the other two as their mirror image, bit by bit. Whether a round is mirrored is the top bit of its byte in the table at <code>$FF94</code>; the other seven bits choose one of 59 two-by-two blocks for the side walls. The platforms use a single glyph per round, eight bytes from <code>$C26E</code>, and the two colours come from <code>$FF30</code>. The top and bottom rows are not stored at all: two bits each in <code>$C58E</code> say whether they have openings.</p>
+  <p>Round 85 spells KIMI in its platforms.</p>
+  <p>The 100 layouts end exactly at <code>$DFFF</code>, so the last 4 KB lie in the RAM under the video and sound chips. The unpacker at <code>$E299</code> switches the chips out of the address space for the copy and back in afterwards.</p>
+  <p>Each round also has an invisible map of air currents, which is what makes a bubble drift along its own route to the place where bubbles gather. The data at <code>$B695</code> is a list of rectangles, each with one of four directions, and a one-byte order to mirror the left half onto the right with left and right swapped. A plain bubble moves the way the cell under it points (<code>$0CF2</code>).</p>
+  <p>Super mode is the game's hidden hard setting. The loop that waits for fire on the title page also checks whether S, U, P, O, R, and the Commodore key are all down (<code>$45A7</code>). If they are, the border flashes red and the code walks every enemy list in memory, turning each wind-up robot into the fire-breather and each boulder-thrower into the bottle-thrower. The checkbox above applies the same rewrite. In the running game it changed 186 enemies: all 114 robots and all 72 boulder-throwers.</p>
+</section>
+</main>
+<footer style="margin:16px 0 0;padding:22px var(--gx) 0;border-top:1px solid #e0ded8;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:12px;color:#80838a"><a href="/kit.html" style="color:#1f5fa8;text-decoration:none">How this page was made</a></footer>
+<script src="../../lib/c64.js"></script>
+<script src="reference/bb-core.js"></script>
+<script src="reference/bb-page.js"></script>

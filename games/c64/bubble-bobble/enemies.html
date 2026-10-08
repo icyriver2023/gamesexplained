@@ -1,0 +1,139 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="reference/bb-page.css">
+<!-- tabs -->
+<header class="hero">
+  <p class="eyebrow">{{platform}} · {{year}} · {{publisher}}</p>
+  <h1>{{title}}</h1>
+  <p class="sub">The eight kinds of enemy, drawn from the game's own sprites, and the routine each one runs, which you can step a frame at a time.</p>
+</header>
+<main class="wrap">
+
+<section>
+  <p class="fig">01 · The cast</p>
+  <h2 class="t">The eight kinds of enemy</h2>
+  <p class="lede">Each round's list gives every enemy a kind from 0 to 7, and the kind picks a picture and a routine.</p>
+  <div class="plate">
+    <table class="bb-table" id="bb-kinds"></table>
+    <p class="cap"><b>Sprites drawn from the game's own data</b> at <code>$5CC0</code>-<code>$703F</code>, in the colours of the table at <code>$AB63</code>. "First round" and "in all" are counted from the 100 enemy lists at <code>$AE51</code>, which hold 572 enemies.</p>
+  </div>
+  <p>An enemy record is three bytes: its kind and column, its row and heading, and how long it waits before it moves. The six sprites not used by the players limit a round to six enemies.</p>
+  <p>The walkers share one routine (<code>$EA08</code>). An enemy on the same level as its player just walks. One below its player keeps a timer, and each time the timer runs out the enemy changes its mind about whether to climb; while it wants to, it jumps for any platform it finds overhead. Three of the walkers also shoot along their row when they face a player who is level with them (<code>$EDCD</code>).</p>
+  <p>Enemies and players never use the video chip's collision registers. Every test is a comparison of coordinates: a player dies within 12 pixels of an enemy (<code>$1D32</code>), and a bubble catches an enemy within 16 (<code>$105B</code>).</p>
+</section>
+
+<section>
+  <p class="fig">02 · Enemy movement</p>
+  <h2 class="t">How an enemy decides, frame by frame</h2>
+  <p class="lede">Each enemy's routine runs on every other frame. Below, the ported game runs one round at a time; step it and read what each enemy's routine did and why.</p>
+  <div class="plate">
+    <div class="bb-toggles">
+      <label>round <input type="number" id="bb-st-round" min="1" max="100" value="1" style="width:4.5em"></label>
+      <button type="button" id="bb-st-go">Go</button>
+      <label>the player <select id="bb-st-joy"><option value="31">stands still</option><option value="27">walks left</option><option value="23">walks right</option><option value="30">holds up</option><option value="15">holds fire</option></select></label>
+      <button type="button" id="bb-st-1" disabled>1 frame</button>
+      <button type="button" id="bb-st-2" disabled>one run of the actors (2 frames)</button>
+      <button type="button" id="bb-st-50" disabled>1 second</button>
+    </div>
+    <div class="bb-row" style="align-items:flex-start;gap:18px">
+      <canvas id="bb-st-cv" width="384" height="272" style="width:384px;max-width:100%;image-rendering:pixelated;background:#000;border-radius:4px"></canvas>
+      <div class="bb-side"><div class="fig">What each enemy did</div><pre id="bb-st-trace" style="margin:0;white-space:pre-wrap;font-family:var(--fm);font-size:12.5px;line-height:1.45"></pre></div>
+    </div>
+    <p class="cap" id="bb-st-cap"><b>The game's own code, ported</b> (the Play tab says how it was checked), with the enemy routines wrapped to say when they run. Go builds the round as the game does; the step buttons move the game's clock. A line names the enemy's state, its position and heading, then the routines that ran in the actor interrupt and what they changed.</p>
+  </div>
+  <p>A walker (<code>$EA08</code>) falls when nothing is under it; on a floor it follows its heading bits, and turns at a wall. Whether it may climb is decided by its chase routine (<code>$EE62</code>). Level with its player it walks. Higher than its player it never climbs. Lower, it keeps a timer (<code>$8660</code>), reloaded each time from the kind's period plus a random 0-31, and each time the timer runs out it changes its mind about climbing (<code>$8700</code>). While it wants to climb it jumps for a platform it finds overhead, or across a gap at the end of its floor, fifteen steps up the arc. The shooter, the bottle thrower and the boulder roller are walkers with a shot added: one call in four, at random, a walker standing on a floor with no shot out and facing a player who is level with it readies one (<code>$EDCD</code>), and never when the player is lower. The hopper never walks: with the climb flag set and a platform within four rows overhead it jumps straight up, otherwise now and then it turns to face its player and hops the way it faces (<code>$1F2E</code>). The two flyers move every call, two pixels across and one or two up or down, reversing at walls, floors and ceilings (<code>$EFC0</code>, <code>$EEB2</code>). The dropper walks four pixels a call and, about once in twenty calls while its reload timer is out and a floor is under it, lets a bolt fall (<code>$1E9F</code>).</p>
+  <p>Once the round timer has run out every enemy is marked angry: its routine gets a second call on every second run of the actor loop, so it moves half as fast again (<code>$16E4</code>). An enemy that escapes a bubble is angry from then on.</p>
+</section>
+</main>
+<footer style="margin:16px 0 0;padding:22px var(--gx) 0;border-top:1px solid #e0ded8;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:12px;color:#80838a"><a href="/kit.html" style="color:#1f5fa8;text-decoration:none">How this page was made</a></footer>
+<script src="../../lib/c64.js"></script>
+<script src="reference/bb-core.js"></script>
+<script src="reference/bb-page.js"></script>
+<script src="reference/bb-port.js"></script>
+<script>
+window.addEventListener('load', async function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const cv = $('bb-st-cv'), trace = $('bb-st-trace'), ctx = cv.getContext('2d'), img = ctx.createImageData(384, 272);
+  const RGB = C64.PAL.map(h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)));
+  const FRAME = BBRuntime.FRAME;
+  const KINDS = ['white wind-up robot', 'grey spiky creature', 'green head on a spring', 'pale green flyer', 'purple whale shape', 'green cloak, red face', 'white robed figure', 'white robot on legs'];
+  const STATES = { 0x0A: 'freed from a bubble', 0x0B: 'thrown', 0x0C: 'falling to the floor', 0x0D: 'carried by water', 0x11: 'turning to food', 0x12: 'food', 0x16: 'frozen, falling', 0x17: 'frozen, lying' };
+  // What each routine does, in the words the trace uses.
+  const SAYS = {
+    enemy_walker: 'walker', enemy_shooter: 'shooter', enemy_hopper: 'hopper', enemy_dropper: 'dropper', enemy_flyer: 'flyer', enemy_flyer_fast: 'fast flyer',
+    enemy_walk_left: 'walks left', enemy_walk_right: 'walks right', enemy_step_left_4: 'steps 4 left', enemy_step_right_4: 'steps 4 right',
+    enemy_chase: 'chase check', enemy_decide_shot: 'looks for a shot',
+    enemy_fall: 'falls', enemy_fall_plain: 'falls', enemy_fall_then_flip: 'falls', fly_left: 'flies left', fly_right: 'flies right', fly_up: 'flies up', fly_down: 'flies down',
+    fly_left_or_turn: 'tries left', fly_right_or_turn: 'tries right', enemy_thrown: 'thrown through the air', fall_to_floor: 'falls to a floor', enemy_released: 'free of its bubble',
+    enemy_frozen_fall: 'frozen, falling', enemy_frozen: 'frozen', carried_by_water: 'carried by the water', enemy_to_food: 'becomes food', food_wait: 'food, waiting',
+  };
+  let G, rt = null, log = [];
+  try { G = await C64.load('listing.json'); } catch (e) { trace.textContent = e.message; return; }
+  function draw() {
+    const r = C64.renderFrame(rt.last), d = img.data, px = r.px;
+    for (let i = 0, o = 0; i < px.length; i++, o += 4) { const c = RGB[px[i]]; d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255; }
+    ctx.putImageData(img, 0, 0);
+  }
+  function build(round) {
+    rt = BBRuntime.create(G.ram, { cost: window.BB_COST });
+    const P = rt.P, M = rt.M;
+    if (round > 1) M[0xF044] = (round - 2) & 255;         // the cracker's own way to a round
+    for (const name of Object.keys(SAYS)) {
+      const f = P[name]; if (typeof f !== 'function') continue;
+      P[name] = function (r) { log.push([M[0x22], name]); return f.apply(this, arguments); };
+    }
+    // the title: fire, release, then 1 on the score table, then on to the first pass of play
+    let f = 0;
+    const until = (n, fn) => { while (rt.frame < n) { fn && fn(); rt.runTo(rt.cycles + FRAME); } };
+    until(20, () => { rt.chips.joy = 0x0F; }); rt.chips.joy = 0x1F;
+    until(40); until(70, () => rt.chips.keys.add(0x38)); rt.chips.keys.clear();
+    rt.runToCheckpoint(0x0A07, 20000);
+    rt.runTo(rt.cycles + 120 * FRAME);                    // the enemies drop in
+    log = [];
+  }
+  // the heading bits of the control byte the AI keeps for an enemy ($85E8): bit 0 left, bit 1 right
+  function heading(x) { const i = rt.M[0x85E8 + x]; return (i & 1) ? 'heading left' : (i & 2) ? 'heading right' : ''; }
+  function report(before) {
+    const M = rt.M, lines = [];
+    for (let x = 2; x < 8; x++) {
+      const st = M[0xB2 + x];
+      if (!st) continue;
+      const kind = st >= 2 && st <= 9 ? st - 2 : null;
+      const what = kind !== null ? 'kind ' + kind + ', ' + KINDS[kind] : (STATES[st] || 'state $' + st.toString(16).toUpperCase());
+      const dx = M[0xBA + x] - before[x][0], dy = M[0xC2 + x] - before[x][1];
+      const moved = (dx || dy) ? ' moved ' + [dx ? Math.abs(dx) + ' px ' + (dx < 0 ? 'left' : 'right') : '', dy ? Math.abs(dy) + ' px ' + (dy < 0 ? 'up' : 'down') : ''].filter(Boolean).join(', ') : ' stayed';
+      // the routines that ran for this actor: each distinct one with its count over the step
+      const ran = log.filter(e => e[0] === x).map(e => SAYS[e[1]] || e[1]);
+      const counts = new Map(); for (const v of ran) counts.set(v, (counts.get(v) || 0) + 1);
+      const runs = log.filter(e => e[0] === x && /^enemy_(walker|shooter|hopper|dropper|flyer|flyer_fast|thrown|released|frozen|frozen_fall|to_food)$|^fall_to_floor$|^carried_by_water$|^food_wait$/.test(e[1])).length;
+      const seq = ran.length ? (runs ? runs + (runs === 1 ? ' run: ' : ' runs: ') : '') + [...counts].map(([k, n]) => n > 1 ? k + ' ×' + n : k).join(', ') : 'waited';
+      const flags = kind !== null ? ' [chase timer ' + M[0x8660 + x] + (M[0x86D8 + x] ? ', level with its player' : '') + (M[0x8700 + x] ? ', wants to climb' : '') + (M[0x87A0 + x] !== 0xFF ? ', in a jump (' + M[0x87A0 + x] + ' steps of the rise left)' : '') + (M[0x87F0 + x] !== 0xFF ? ', falling' : '') + ']' : '';
+      lines.push('#' + x + ' ' + what + ' at (' + M[0xBA + x] + ',' + M[0xC2 + x] + ') ' + heading(x) + moved + '\n    ' + seq + flags);
+    }
+    const p = 'player at (' + M[0xBA] + ',' + M[0xC2] + ')' + (M[0x2D] === 1 ? ', hurry up: every enemy angry' : '');
+    trace.textContent = 'frame ' + rt.frame + ', ' + p + '\n' + (lines.join('\n') || 'no enemy alive');
+  }
+  function step(frames) {
+    if (!rt) return;
+    const before = []; for (let x = 0; x < 8; x++) before[x] = [rt.M[0xBA + x], rt.M[0xC2 + x]];
+    log = [];
+    rt.chips.joy = +$('bb-st-joy').value;
+    try { rt.runTo(rt.cycles + frames * FRAME); } catch (e) { trace.textContent = 'The port stopped: ' + e.message; return; }
+    draw(); report(before);
+  }
+  $('bb-st-go').onclick = () => {
+    const n = Math.max(1, Math.min(100, +$('bb-st-round').value || 1));
+    trace.textContent = 'Building round ' + n + '…';
+    setTimeout(() => {
+      try { build(n); } catch (e) { trace.textContent = 'The port stopped: ' + e.message; return; }
+      for (const b of ['bb-st-1', 'bb-st-2', 'bb-st-50']) $(b).disabled = false;
+      step(0);
+    }, 20);
+  };
+  $('bb-st-1').onclick = () => step(1); $('bb-st-2').onclick = () => step(2); $('bb-st-50').onclick = () => step(50);
+});
+</script>

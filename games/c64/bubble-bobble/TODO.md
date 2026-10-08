@@ -21,9 +21,8 @@ section by section, cut what is dull, and say what deserves more.
 - The page is ready for the steward's pass. The four sections added for
   it (Controls, Enemy movement, The sound, Discoveries) are agent-draft
   like the rest.
-- The enemy stepper inlines the whole port into `index.html` (340 KB);
-  a shared script file would halve the site's weight for this game, but
-  the site builder copies no scripts beside a page.
+- The Enemies tab loads the whole port (340 KB) from `reference/bb-port.js`,
+  as the Play tab inlines it; the two copies could be one.
 
 ## The listing
 

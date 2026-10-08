@@ -1,0 +1,54 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="reference/bb-page.css">
+<!-- tabs -->
+<header class="hero">
+  <p class="eyebrow">{{platform}} · {{year}} · {{publisher}}</p>
+  <h1>{{title}}</h1>
+  <p class="sub">A title page that plays once, a credit counter one ahead of you, code that patches itself shut, and more the manual never says.</p>
+</header>
+<main class="wrap">
+
+<section>
+  <p class="fig">01 · Memory</p>
+  <h2 class="t">Secret: the title page can only ever play once</h2>
+  <p class="lede">After the first game, the game returns to its score table and never to the title.</p>
+  <div class="bb-two">
+    <div class="plate"><img class="bb-shot" src="reference/title.png" alt="The title page"><p class="cap">Shown once, with its own tune.</p></div>
+    <div class="plate"><img class="bb-shot" src="reference/player-select.png" alt="The score table"><p class="cap">The screen every later game starts from.</p></div>
+  </div>
+  <p>The program fills the machine from <code>$0400</code> to <code>$FFFF</code>, and the title page is what it gives up to make room. The code that draws the title and waits for fire starts at <code>$4460</code>, inside the character set, next to the glyphs of the big lettering. The first round's graphics are written over both. The title's tune sits at <code>$8B00</code>, in the kilobyte that becomes the clean copy of the screen as soon as a round is drawn.</p>
+  <p>The same economy shows elsewhere. A sprite is 63 bytes in a 64-byte slot, and fifteen of the game's variables live in the spare bytes, from <code>$587F</code> to <code>$5C3F</code>. The collision map is 40 bytes wide for a playfield of 32 columns, and the eight spare bytes of each row hold one value for each of the eight actors (<code>$8520</code>).</p>
+</section>
+
+<section>
+  <p class="fig">02 · Discoveries</p>
+  <h2 class="t">What the manual never says</h2>
+  <p class="lede">Things found in the code that a player who finished the game would not know. Each was traced in the listing; where it says so, it was also watched in the running game.</p>
+  <h3>The credit counter is one ahead of you</h3>
+  <p>A one-player game starts with eight continues and a two-player game with seven (<code>$08E4</code>, the LDX #7 at <code>$0961</code> and the INC for one player). The panel prints one more than are left, so a new game shows CREDITS 9.</p>
+  <h3>Once the credits are gone, the game patches itself shut</h3>
+  <p>The rejoin check hangs off a JMP at <code>$049D</code>. When the last credit is used, the check writes an RTS over that JMP, and nobody can rejoin for the rest of the game (<code>$052A</code>). The JMP is put back at the start of the next game (<code>$0997</code>).</p>
+  <h3>Enemies think 25 times a second, bubbles 16</h3>
+  <p>The players and the enemies run inside the raster interrupt at line 50, on every other frame (<code>$072E</code>). The bubbles, shots and items run in the main loop, and a pass of the main loop waits for the frame counter to move twice, so a pass is three frames (<code>$0A5A</code>). Counted in the running game over 300 frames: 150 runs of the actors, 100 passes.</p>
+  <h3>When the bubble table is full, two bubbles burst to make room</h3>
+  <p>Eighteen objects fit. The ageing routine, finding fewer than two free slots, calls the routine that bursts one plain bubble and then runs into it, so two burst (<code>$145C</code>, then the fall into <code>$145F</code>).</p>
+  <h3>How far two bubbles may overlap is set from the wrong register</h3>
+  <p>The round set-up loads <code>$1E</code> into Y (or <code>$E6</code> on rounds 35 and 97) as the distance at which two overlapping bubbles push apart, then stores A instead, and A holds the round number (<code>$F217</code>). So the distance is 0 on round 1 and grows by one a round, read as 0 and <code>$63</code> from the running game on rounds 1 and 100. The two values in Y are never used.</p>
+  <h3>Round 100's tune is reached through an opcode the 6502 never had</h3>
+  <p>The same set-up skips an instruction with a BIT and lands on <code>$5C</code> at <code>$05E7</code>, an undocumented three-byte no-op, before the JSR that starts the boss round's tune (<code>$05C5</code>). It works on every 6510 made, and on the emulator.</p>
+  <h3>Nothing takes a Baron away</h3>
+  <p>A Baron is an object with a routine that only moves it (<code>$1473</code>). No bubble, shot or item tests for it, so a Baron leaves the screen only with the round, or with the player it was sent for.</p>
+  <h3>The EXTEND letters are not a reward</h3>
+  <p>The manual says the letters appear when several enemies are burst at once. In this version a letter bubble comes out of the vents like any other special bubble, in the rounds whose data allows it, chosen at random (<code>$0C9C</code>). Nothing counts chains towards them.</p>
+  <h3>The random numbers are stirred by a timer the game never sets</h3>
+  <p>Every draw mixes the generator's two bytes with the low byte of CIA 1's timer B (<code>$E9EA</code>), and the start-up seeds it from the raster line and timer A (<code>$4461</code>). The game sets neither timer; it reads whatever the KERNAL and the loader left running.</p>
+</section>
+</main>
+<footer style="margin:16px 0 0;padding:22px var(--gx) 0;border-top:1px solid #e0ded8;font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-size:12px;color:#80838a"><a href="/kit.html" style="color:#1f5fa8;text-decoration:none">How this page was made</a></footer>
+<script src="../../lib/c64.js"></script>
+<script src="reference/bb-core.js"></script>
+<script src="reference/bb-page.js"></script>

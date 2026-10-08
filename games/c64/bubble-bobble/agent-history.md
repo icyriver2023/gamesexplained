@@ -201,3 +201,18 @@ comments after a first draft had put in two things the code does not do
 (a walker turning to face its player on landing, which only the dropper
 does, and walking off an edge when above its player). Both pages were
 driven in headless Chrome over the DevTools protocol before the commit.
+
+**The tabs (7 October 2026).** The one long page was split the way
+Chiller's is: Overview, Play, Gameplay, Enemies, Controls, Maps,
+Graphics, Music, Discoveries, Source code, About, listed in `game.json`.
+The style sheet, the decoders and the widgets went to `reference/`,
+which the site builder copies beside the pages, so the port (340 KB) and
+the music driver are loaded once as scripts instead of being inlined;
+`work/port/index-port.js` and `work/port/music-driver.js` write them
+there. Each widget block now runs only on the page that has its elements.
+The Overview gained two short sections: the makers as the title page
+names them and what is unusual about the conversion, and the list of
+tabs. Every tab was loaded in headless Chrome and its widgets counted;
+the one error (a shared animation counter left in one block) was fixed
+before the commit.
+
