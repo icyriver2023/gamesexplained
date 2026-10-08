@@ -184,3 +184,20 @@ now make. The page was driven headless over Chrome's DevTools protocol
 for some seconds, presses keys, and reports the console. The first build was a
 script three hundred copies long, because a string replacement had
 expanded `$'` inside the code.
+
+**Four more sections for the Gold pass (7 October 2026).** The three
+Gold pages on the site (Jupiter Lander, Radar Rat Race, Chiller) and the
+section list in `70-minisite` were compared with this page, and the gaps
+filled with what the port had made possible: a Controls section with the
+numbers measured in the emulator; the sound, with the ported music driver
+playing all twelve tunes through the site's SID model (the driver is cut
+out of the port's source by `work/port/music-driver.js`); an enemy
+stepper that runs the whole port one frame or one actor run at a time
+and prints what each enemy's routine did, with the port inlined by
+`work/port/index-port.js`; and a Discoveries section of nine findings
+from the code, each with its address and, where there was one, the live
+observation. The movement paragraph was written from the routines'
+comments after a first draft had put in two things the code does not do
+(a walker turning to face its player on landing, which only the dropper
+does, and walking off an edge when above its player). Both pages were
+driven in headless Chrome over the DevTools protocol before the commit.

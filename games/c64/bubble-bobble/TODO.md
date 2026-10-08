@@ -16,6 +16,15 @@ section by section, cut what is dull, and say what deserves more.
   race (`play.html`, section 01); a port that yields between objects, with
   the cost of each, would land the interrupt closer to where it falls.
 
+## Gold
+
+- The page is ready for the steward's pass. The four sections added for
+  it (Controls, Enemy movement, The sound, Discoveries) are agent-draft
+  like the rest.
+- The enemy stepper inlines the whole port into `index.html` (340 KB);
+  a shared script file would halve the site's weight for this game, but
+  the site builder copies no scripts beside a page.
+
 ## The listing
 
 - The comments on tables and variables (767 of the 1,194) were sampled,
