@@ -4,8 +4,8 @@
 Scans the working tree (or the paths given) and fails if it finds: a file
 with a game-image extension; a file whose size is a known disk-image size;
 a file starting with a known snapshot magic; a JSON file carrying a
-"raw_data_base64" field; a jsbeeb snapshot (the BBC Micro's), gzipped or
-not. work/ folders are skipped except their README.
+"raw_data_base64" field; a jsbeeb snapshot (the BBC Micro's) or the kit's
+NES snapshot, gzipped or not. work/ folders are skipped except their README.
 Game data a page's widgets need, embedded in its HTML, is not a binary
 (AGENTS.md, "No binaries, ever").
 
@@ -31,6 +31,7 @@ MAGIC = [(b"VICE Snapshot File", "VICE snapshot"), (b"C64 CARTRIDGE", "cartridge
          (b"UEF File!", "UEF tape or BeebEm snapshot"), (b"HXCPICFE", "HFE disc image"),
          (b"HXCHFEV3", "HFE disc image")]
 JSBEEB = re.compile(rb'"format"\s*:\s*"jsbeeb-snapshot"')   # the BBC Micro's snapshot, kit/bbc/snapshot.py
+KIT_NES = re.compile(rb'"format"\s*:\s*"kit-nes-snapshot"')  # the NES's, kit/nes/snapshot.py
 SKIP_DIRS = {".git", "__pycache__", "node_modules", "tools", "_site"}
 
 
@@ -54,7 +55,7 @@ def check(path):
         with open(path, "rb") as f:
             if b"raw_data_base64" in f.read():
                 return "JSON with an embedded memory image"
-    if head.startswith(b"\x1f\x8b"):     # gzip: what jsbeeb's snapshot is, whatever the name
+    if head.startswith(b"\x1f\x8b"):     # gzip: what jsbeeb's snapshot and the NES's are, whatever the name
         with open(path, "rb") as f:
             try:
                 head = zlib.decompressobj(16 + zlib.MAX_WBITS).decompress(f.read(65536), 256)
@@ -62,6 +63,8 @@ def check(path):
                 return None
     if JSBEEB.search(head):
         return "jsbeeb snapshot"
+    if KIT_NES.search(head):
+        return "NES snapshot"
     return None
 
 
